@@ -1,0 +1,7 @@
+.cache
+
+# Binaries and Intermediate
+build/
+Debug/
+
+compile_commands.json
