@@ -11,6 +11,8 @@ public:
   std::string Extract();
   void Clear();
 
+  inline std::string GetBuffer() { return m_Buffer; }
+
 private:
   int m_Id;
   std::string m_Buffer;

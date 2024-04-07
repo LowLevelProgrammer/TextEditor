@@ -1,6 +1,8 @@
 #include "TextBuffer.h"
+#include <algorithm>
 #include <iostream>
 #include <string>
+#include <vector>
 
 TextBuffer::TextBuffer()
     : m_CaretPosition({0, 0}), m_SelectionStartPosition({-1, -1}),
@@ -10,14 +12,14 @@ TextBuffer::TextBuffer()
 TextBuffer::~TextBuffer() {}
 
 void TextBuffer::InsertLine(std::string text) {
-  m_Lines.push_back(text + '\n');
+  m_Lines.push_back(text);
   m_CaretPosition.Line++;
   m_CaretPosition.Column = text.size();
 }
 
-void TextBuffer::Delete() {
+void TextBuffer::Backspace() {
   if (m_IsSelected) {
-
+    DeleteSelection();
   } else {
     m_Lines[m_CaretPosition.Line - 1].erase(
         m_Lines[m_CaretPosition.Line - 1].begin() + m_CaretPosition.Column - 1);
@@ -43,7 +45,7 @@ void TextBuffer::Redo() {
 
 void TextBuffer::PrintBuffer() {
   for (auto line : m_Lines) {
-    std::cout << line;
+    std::cout << line << std::endl;
   }
 }
 
@@ -66,17 +68,19 @@ std::string TextBuffer::GetSelectedText() {
 
   std::string buffer;
 
+  // TODO: Find a cleaner way to do this
   int currentLine = start.Line;
   int offset = start.Column;
   while (currentLine <= end.Line) {
     // Breaking condition
-    if (currentLine == end.Line && offset > end.Column) {
+    if (currentLine == end.Line && offset >= end.Column) {
       break;
     }
-    // Compensate of 1 based indexing
+    // Compensate for 1 based indexing
     if (offset > m_Lines[currentLine - 1].size()) {
       offset = 1;
       currentLine++;
+      buffer.push_back('\n');
     }
     buffer.push_back(m_Lines[currentLine - 1][offset - 1]);
     offset++;
@@ -117,6 +121,8 @@ void TextBuffer::DeleteSelection() {
     // Erease the duplicated remaining line at selection end
     m_Lines.erase(m_Lines.begin() + newEndLine - 1);
   }
+  m_IsSelected = false;
+  m_CaretPosition = start;
 }
 
 std::pair<Position, Position> TextBuffer::DetermineEnds() {
@@ -137,4 +143,44 @@ std::pair<Position, Position> TextBuffer::DetermineEnds() {
     end = m_SelectionStartPosition;
   }
   return {start, end};
+}
+
+void TextBuffer::InsertBuffer(Register reg) {
+  // TODO: Optimize
+  std::vector<std::string> buffer;
+  std::string content = reg.Extract();
+  int begin = 0, end = -1;
+
+  for (int i = 0; i < content.size(); i++) {
+    if (content[i] == '\n' || i == content.size() - 1) {
+      end = i;
+      buffer.push_back(content.substr(begin, end));
+      begin = i + 1;
+    }
+  }
+
+  auto [line, offset] = m_CaretPosition;
+
+  // If there are multiple lines in the buffer i.e there's a newline character
+  // Need to split the line at the position where caret is present
+  if (buffer.size() > 1 ||
+      (buffer.size() == 1 &&
+       std::find(buffer.begin(), buffer.end(), "\n") != buffer.end())) {
+    std::string temp = m_Lines[line - 1].substr(offset - 1);
+    m_Lines[line - 1].erase(offset - 1);
+    if (temp != "")
+      m_Lines.insert(m_Lines.begin() + line, temp);
+  }
+
+  if (buffer[0] != "\n") {
+    m_Lines[line - 1].append(buffer[0]);
+  }
+
+  // Dont iterate through the last element because it needs to be appended
+  for (int i = 1; i < buffer.size() - 1; i++) {
+    m_Lines.insert(m_Lines.begin() + line, buffer[i]);
+    line++;
+  }
+
+  m_Lines[line].insert(0, buffer[buffer.size() - 1]);
 }

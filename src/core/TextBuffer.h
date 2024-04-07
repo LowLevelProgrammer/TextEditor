@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Register.h"
 #include <string>
 #include <vector>
 
@@ -14,7 +15,7 @@ public:
   ~TextBuffer();
 
   void InsertLine(std::string text);
-  void Delete();
+  void Backspace();
   void Undo();
   void Redo();
   void PrintBuffer();
@@ -22,6 +23,7 @@ public:
   void SetCaretPosition(int line, int column);
   std::string GetSelectedText();
   bool SelectionActive();
+  void InsertBuffer(Register reg);
 
   inline std::vector<std::string> GetHistory() { return m_History; }
   void DeleteSelection();

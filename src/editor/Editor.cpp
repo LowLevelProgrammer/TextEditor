@@ -23,9 +23,9 @@ void Editor::Run() {
     m_TextBuffer.InsertLine(line);
   }
 
-  m_TextBuffer.Delete();
-  m_TextBuffer.Delete();
-  m_TextBuffer.Delete();
+  m_TextBuffer.Backspace();
+  m_TextBuffer.Backspace();
+  m_TextBuffer.Backspace();
   std::cout << "Text in the buffer\n";
 
   Display();
@@ -38,10 +38,8 @@ void Editor::Copy(int registerNumber) {
 }
 
 void Editor::Paste(int registerNumber) {
-  if (m_TextBuffer.SelectionActive()) {
-
-  } else {
-  }
+  if (m_TextBuffer.SelectionActive())
+    m_TextBuffer.DeleteSelection();
 }
 
 void Editor::Display() { m_TextBuffer.PrintBuffer(); }
