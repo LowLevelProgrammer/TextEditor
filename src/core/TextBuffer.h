@@ -24,9 +24,11 @@ public:
   std::string GetSelectedText();
   bool SelectionActive();
   void InsertBuffer(Register reg);
+  void DeleteSelection();
 
   inline std::vector<std::string> GetHistory() { return m_History; }
-  void DeleteSelection();
+  std::vector<std::string> GetLines() { return m_Lines; }
+  const std::vector<std::string> &GetLines() const { return m_Lines; }
 
 private:
   std::vector<std::string> m_Lines;
