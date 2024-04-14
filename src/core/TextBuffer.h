@@ -20,7 +20,7 @@ public:
   void Redo();
   void PrintBuffer();
   void Select(Position start, Position end);
-  void SetCaretPosition(int line, int column);
+  void SetCaretPosition(Position position);
   std::string GetSelectedText();
   bool SelectionActive();
   void InsertBuffer(Register reg);

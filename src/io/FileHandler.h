@@ -3,19 +3,22 @@
 #include "TextBuffer.h"
 #include <fstream>
 #include <string>
-#include <vector>
 class FileHandler {
 public:
-  FileHandler(std::string filePath);
+  FileHandler();
   ~FileHandler();
 
-  bool CreateFile(std::string fileName);
-  bool OpenFile(std::string fileName);
-  std::vector<std::string> ReadFromFile();
+  void CreateFile(std::string filePath);
+  void OpenFile(std::string filePath);
+  TextBuffer ReadFromFile();
   void WriteToFile(const TextBuffer &textBuffer);
-  bool CloseFile();
+  void CloseFile();
+
+  void SetFilePath(std::string filePath);
+  inline bool GetIsOpen() { return m_IsOpen; }
 
 private:
+  // File path includes file name
   std::string m_FilePath;
   std::fstream m_FileStream;
   bool m_IsOpen = false;

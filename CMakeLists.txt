@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Include directories
 include_directories(src/core)
 include_directories(src/io)
+include_directories(src/editor)
 
 # Glob all sourcea and header files recursively
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")

@@ -55,8 +55,8 @@ void TextBuffer::Select(Position start, Position end) {
   m_IsSelected = true;
 }
 
-void TextBuffer::SetCaretPosition(int line, int column) {
-  m_CaretPosition = {line, column};
+void TextBuffer::SetCaretPosition(Position position) {
+  m_CaretPosition = {position.Line, position.Column};
   m_IsSelected = false;
 }
 
@@ -91,8 +91,10 @@ std::string TextBuffer::GetSelectedText() {
 
 bool TextBuffer::SelectionActive() { return m_IsSelected; }
 
+// TODO: Store history to add undo feature
 void TextBuffer::DeleteSelection() {
   auto [start, end] = DetermineEnds();
+  // If selection is within the same line then simply delete
   if (start.Line == end.Line) {
     int countOfELementsToRemove = end.Line - start.Line + 1;
     m_Lines[start.Line - 1].erase(start.Column - 1, countOfELementsToRemove);
@@ -113,7 +115,7 @@ void TextBuffer::DeleteSelection() {
     }
     // Deleting the lines in between changes selection end
     int newEndLine = start.Line + 1;
-    // Deleting the starting part of selecting end
+    // Deleting the starting part of selection end
     int numCharsToDisplace = end.Column;
     m_Lines[newEndLine - 1].erase(0, numCharsToDisplace);
     // Append remaining line of the selection end to the selection start offset
