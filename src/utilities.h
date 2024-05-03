@@ -1,10 +1,18 @@
+#include "TextBuffer.h"
 #include <iostream>
 #include <string>
 #include <vector>
-void PrintVector(std::vector<std::string> vec) {
+
+inline void PrintLines(std::vector<std::string> vec) {
   std::cout << std::endl;
-  for (auto it : vec) {
-    std::cout << it << " ";
+  for (auto line : vec) {
+    std::cout << line << std::endl;
   }
-  std::cout << std::endl;
+}
+
+inline void InsertLine(TextBuffer &tb, const std::string &line) {
+  for (const auto &ch : line) {
+    tb.InsertChar(ch);
+  }
+  tb.InsertChar('\n');
 }

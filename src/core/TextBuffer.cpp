@@ -5,11 +5,25 @@
 #include <vector>
 
 TextBuffer::TextBuffer()
-    : m_CaretPosition({0, 0}), m_SelectionStartPosition({-1, -1}),
+    : m_CaretPosition({1, 1}), m_SelectionStartPosition({-1, -1}),
       m_IsSelected(false) {
   m_Lines.clear();
+  m_Lines.push_back({});
 }
 TextBuffer::~TextBuffer() {}
+
+void TextBuffer::InsertChar(char character) {
+  // TODO: Check for valid caret position
+  if (character == '\n') {
+    m_Lines.push_back({});
+    m_CaretPosition.Line++;
+    m_CaretPosition.Column = 1;
+  } else {
+    m_Lines[m_CaretPosition.Line - 1].insert(m_CaretPosition.Column - 1, 1,
+                                             character);
+    m_CaretPosition.Column++;
+  }
+}
 
 void TextBuffer::InsertLine(std::string text) {
   m_Lines.push_back(text);
@@ -21,8 +35,7 @@ void TextBuffer::Backspace() {
   if (m_IsSelected) {
     DeleteSelection();
   } else {
-    m_Lines[m_CaretPosition.Line - 1].erase(
-        m_Lines[m_CaretPosition.Line - 1].begin() + m_CaretPosition.Column - 1);
+    m_Lines[m_CaretPosition.Line - 1].erase(m_CaretPosition.Column - 2, 1);
     m_CaretPosition.Column--;
   }
 }

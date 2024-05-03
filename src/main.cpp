@@ -1,38 +1,47 @@
 #include <iostream>
 #include <string>
 
-#include "Editor.h"
+#include "TextBuffer.h"
+#include "utilities.h"
 
 int main() {
-  Editor editor;
-  // editor.Run();
+  TextBuffer tb;
 
-  editor.InsertLine("Hello, World!");
-  editor.InsertLine("I'm Akash");
-  editor.InsertLine("Random string");
-  editor.InsertLine("This is another test string");
-  editor.InsertLine("Yet another line");
+  InsertLine(tb, "Hello, World!");
+  InsertLine(tb, "I'm Akash");
+  InsertLine(tb, "Random string");
+  InsertLine(tb, "This is another test string");
+  InsertLine(tb, "Yet another line");
+  tb.InsertChar('w');
+  tb.InsertChar('o');
+  tb.InsertChar('r');
+  tb.InsertChar('d');
+  tb.Backspace();
 
-  editor.Display();
+  PrintLines(tb.GetLines());
 
   std::cout << "------------------------\n";
+  const Position &caret = tb.GetCaretPosition();
 
-  editor.Select({2, 6}, {3, 9});
+  // std::cout << caret.Line << " " << caret.Column;
+  tb.SetCaretPosition({6, 3});
+  tb.Backspace();
+
   // tb.Select({2, 6}, {3, 9});
-  editor.BackSpace();
   // tb.Backspace();
 
   // Register reg(1);
   // reg.Insert(tb.GetSelectedText());
   // std::cout << reg.GetBuffer();
 
+  PrintLines(tb.GetLines());
   std::cout << "\n------------------------\n";
 
   // tb.SetCaretPosition(4, 4);
 
   // tb.InsertBuffer(reg);
 
-  editor.Display();
+  // editor.Display();
   // tb.PrintBuffer();
   // std::cout << reg.GetBuffer();
 
