@@ -8,7 +8,7 @@ int main() {
   TextBuffer tb;
 
   InsertLine(tb, "Hello, World!");
-  InsertLine(tb, "I'm Akash");
+  InsertLine(tb, "I'm  Akash");
   InsertLine(tb, "Random string");
   InsertLine(tb, "This is another test string");
   InsertLine(tb, "Yet another line");
@@ -24,8 +24,8 @@ int main() {
   const Position &caret = tb.GetCaretPosition();
 
   // std::cout << caret.Line << " " << caret.Column;
-  tb.SetCaretPosition({6, 3});
-  tb.Backspace();
+  // tb.SetCaretPosition({6, 3});
+  // tb.Backspace();
 
   // tb.Select({2, 6}, {3, 9});
   // tb.Backspace();
@@ -34,7 +34,8 @@ int main() {
   // reg.Insert(tb.GetSelectedText());
   // std::cout << reg.GetBuffer();
 
-  PrintLines(tb.GetLines());
+  // PrintLines(tb.GetLines());
+  PrintHistory(tb.GetHistory());
   std::cout << "\n------------------------\n";
 
   // tb.SetCaretPosition(4, 4);

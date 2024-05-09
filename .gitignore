@@ -1,8 +1,11 @@
 .cache
+.idea
+.vscode
 
 # Binaries and Intermediate
 build/
 Debug/
+cmake-build-debug/
 
 compile_commands.json
 
