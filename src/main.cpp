@@ -8,8 +8,11 @@ int main() {
   TextBuffer tb;
 
   InsertLine(tb, "Hello, World!");
+  tb.InsertChar('\n');
   InsertLine(tb, "I'm  Akash");
   InsertLine(tb, "Random string");
+  tb.InsertChar('\n');
+  tb.InsertChar('\n');
   InsertLine(tb, "This is another test string");
   InsertLine(tb, "Yet another line");
   tb.InsertChar('w');

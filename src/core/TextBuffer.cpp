@@ -29,27 +29,39 @@ void TextBuffer::InsertChar(char character) {
     historyHead = m_History.size() - 1;
     contentHead = 1;
   }
-  // If a newline character then add a new element to text buffer and history
-  // Insert newline character in history but not in text buffer
+  // If a newline character then always add an element to text buffer
   else if (character == '\n') {
     // Add new element to text buffer
     m_Lines.push_back({});
 
-    // Add new element to history
-    m_History.push_back({ActionType::Insert,
-                         "",
-                         {m_CaretPosition.Line, m_CaretPosition.Column},
-                         {m_CaretPosition.Line, m_CaretPosition.Column}});
+    // If first newline character then add new element history
+    // Else if consecutive newline then append to last action
+    if (m_History[historyHead].Content[contentHead] == '\n') {
+      // Append in consecutive newline chars
+      m_History[historyHead].Content.push_back('\n');
+      m_History[historyHead].PositionEnd.Column = 1;
 
-    historyHead = m_History.size() - 1;
-    m_CaretPosition.Line++;
-    m_CaretPosition.Column = 1;
-    // Insert newline character to the element in history
-    m_History[historyHead].Content.push_back('\n');
-    // Update end position
-    m_History[historyHead].PositionEnd.Line = m_CaretPosition.Line;
-    m_History[historyHead].PositionEnd.Column = m_CaretPosition.Column;
-    // Return because we don't need to add newline char in text buffer
+      // Update Caret Position
+      m_CaretPosition.Line++;
+      m_CaretPosition.Column = 1;
+
+    } else {
+      // Add new element to history
+      m_History.push_back({ActionType::Insert,
+                           "",
+                           {m_CaretPosition.Line, m_CaretPosition.Column},
+                           {m_CaretPosition.Line, m_CaretPosition.Column}});
+
+      historyHead = m_History.size() - 1;
+      m_CaretPosition.Line++;
+      m_CaretPosition.Column = 1;
+      // Insert newline character to the element in history
+      m_History[historyHead].Content.push_back('\n');
+      // Update end position
+      m_History[historyHead].PositionEnd.Line = m_CaretPosition.Line;
+      m_History[historyHead].PositionEnd.Column = m_CaretPosition.Column;
+      // Return because we don't need to add newline char in text buffer
+    }
     return;
   }
   // Insert to text buffer
