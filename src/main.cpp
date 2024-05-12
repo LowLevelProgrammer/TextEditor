@@ -19,12 +19,32 @@ int main() {
   tb.InsertChar('o');
   tb.InsertChar('r');
   tb.InsertChar('d');
-  tb.Backspace();
 
   PrintLines(tb.GetLines());
 
   std::cout << "------------------------\n";
   const Position &caret = tb.GetCaretPosition();
+
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+  tb.Undo();
+
+  std::cout << "After Undo:-" << std::endl;
+
+  PrintLines(tb.GetLines());
 
   // std::cout << caret.Line << " " << caret.Column;
   // tb.SetCaretPosition({6, 3});
@@ -38,8 +58,9 @@ int main() {
   // std::cout << reg.GetBuffer();
 
   // PrintLines(tb.GetLines());
-  PrintHistory(tb.GetHistory());
+  // PrintHistory(tb.GetHistory());
   std::cout << "\n------------------------\n";
+  PrintCaretPosition(tb.GetCaretPosition());
 
   // tb.SetCaretPosition(4, 4);
 

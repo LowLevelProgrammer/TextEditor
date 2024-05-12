@@ -1,5 +1,6 @@
 #include "TextBuffer.h"
 #include <algorithm>
+#include <assert.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -92,11 +93,37 @@ void TextBuffer::Backspace() {
 }
 
 void TextBuffer::Undo() {
-  if (m_Lines.size() > 0) {
-    std::string toUndo = m_Lines[m_Lines.size() - 1];
-    // m_History.emplace_back(toUndo);
-    m_Lines.pop_back();
+  if (m_History.empty())
+    return;
+  Action mostRecentAction = m_History[m_History.size() - 1];
+  int numCharToRemove = mostRecentAction.Content.size();
+
+  Position positionOfCharToRemove = mostRecentAction.PositionEnd;
+  // Compensate because the caret is on the right of the character
+  positionOfCharToRemove.Column--;
+  while (numCharToRemove) {
+    // Removes newline "character"
+    if (m_Lines[positionOfCharToRemove.Line - 1].size() == 0) {
+      m_Lines.erase(m_Lines.begin() + positionOfCharToRemove.Line - 1);
+      positionOfCharToRemove.Line--;
+      positionOfCharToRemove.Column =
+          m_Lines[positionOfCharToRemove.Line - 1].size();
+    }
+    // Removes any other character
+    else {
+      m_Lines[positionOfCharToRemove.Line - 1].erase(
+          positionOfCharToRemove.Column - 1, 1);
+      positionOfCharToRemove.Column--;
+    }
+    numCharToRemove--;
   }
+  // Compensate as caret will be on the right side of the character
+  positionOfCharToRemove.Column++;
+
+  assert(positionOfCharToRemove == mostRecentAction.PositionStart);
+  m_CaretPosition = positionOfCharToRemove;
+  // Remove most recent action from the stack
+  m_History.pop_back();
 }
 
 void TextBuffer::Redo() {

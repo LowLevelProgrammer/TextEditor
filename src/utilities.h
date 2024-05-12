@@ -54,3 +54,8 @@ inline void PrintHistory(const std::vector<Action> &history) {
               << ", " << ele.PositionEnd.Column << " }" << std::endl;
   }
 }
+
+inline void PrintCaretPosition(const Position &position) {
+  std::cout << "Caret Position: { " << position.Line << ", " << position.Column
+            << " }" << std::endl;
+}
