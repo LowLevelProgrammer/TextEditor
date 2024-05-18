@@ -49,7 +49,13 @@ public:
   inline std::vector<std::string> GetLines() const { return m_Lines; }
   inline const std::vector<std::string> &GetLines() { return m_Lines; }
   inline const Position &GetCaretPosition() const { return m_CaretPosition; }
-  inline const std::vector<Action> &GetHistory() const { return m_History; }
+  inline const std::vector<Action> &GetHistory() const { return m_UndoStack; }
+  inline const int GetNumElementsUndoStack() const {
+    return m_UndoStack.size();
+  }
+  inline const int GetNumElementsRedoStack() const {
+    return m_RedoStack.size();
+  }
 
 private:
   std::vector<std::string> m_Lines;
@@ -60,7 +66,8 @@ private:
   // TODO: Check file bounds before any caret position setting operation
   // everywhere
   Position m_FileEnd;
-  std::vector<Action> m_History;
+  std::vector<Action> m_UndoStack;
+  std::vector<Action> m_RedoStack;
 
 private:
   std::pair<Position, Position> DetermineEnds();

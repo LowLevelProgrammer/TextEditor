@@ -10,24 +10,25 @@ TextBuffer::TextBuffer()
       m_IsSelected(false) {
   m_Lines.clear();
   m_Lines.push_back({});
-  m_History.push_back({.PositionStart = {1, 1}, .PositionEnd = {1, 1}});
+  m_UndoStack.push_back({.PositionStart = {1, 1}, .PositionEnd = {1, 1}});
 }
 TextBuffer::~TextBuffer() {}
 
 void TextBuffer::InsertChar(char character) {
   // TODO: Check for valid caret position
-  int historyHead = m_History.size() - 1;
-  int contentHead = m_History[historyHead].Content.size() - 1;
+  int historyHead = m_UndoStack.size() - 1;
+  int contentHead = m_UndoStack[historyHead].Content.size() - 1;
   // If the character is a space
   // If it's the first space then add a new action element in history
   // else append to existing action
-  if (character == ' ' && m_History[historyHead].Content[contentHead] != ' ') {
+  if (character == ' ' &&
+      m_UndoStack[historyHead].Content[contentHead] != ' ') {
     // Add new history element
-    m_History.push_back({ActionType::Insert,
-                         "",
-                         {m_CaretPosition.Line, m_CaretPosition.Column},
-                         {m_CaretPosition.Line, m_CaretPosition.Column}});
-    historyHead = m_History.size() - 1;
+    m_UndoStack.push_back({ActionType::Insert,
+                           "",
+                           {m_CaretPosition.Line, m_CaretPosition.Column},
+                           {m_CaretPosition.Line, m_CaretPosition.Column}});
+    historyHead = m_UndoStack.size() - 1;
     contentHead = 1;
   }
   // If a newline character then always add an element to text buffer
@@ -37,10 +38,10 @@ void TextBuffer::InsertChar(char character) {
 
     // If first newline character then add new element history
     // Else if consecutive newline then append to last action
-    if (m_History[historyHead].Content[contentHead] == '\n') {
+    if (m_UndoStack[historyHead].Content[contentHead] == '\n') {
       // Append in consecutive newline chars
-      m_History[historyHead].Content.push_back('\n');
-      m_History[historyHead].PositionEnd.Column = 1;
+      m_UndoStack[historyHead].Content.push_back('\n');
+      m_UndoStack[historyHead].PositionEnd.Column = 1;
 
       // Update Caret Position
       m_CaretPosition.Line++;
@@ -48,19 +49,19 @@ void TextBuffer::InsertChar(char character) {
 
     } else {
       // Add new element to history
-      m_History.push_back({ActionType::Insert,
-                           "",
-                           {m_CaretPosition.Line, m_CaretPosition.Column},
-                           {m_CaretPosition.Line, m_CaretPosition.Column}});
+      m_UndoStack.push_back({ActionType::Insert,
+                             "",
+                             {m_CaretPosition.Line, m_CaretPosition.Column},
+                             {m_CaretPosition.Line, m_CaretPosition.Column}});
 
-      historyHead = m_History.size() - 1;
+      historyHead = m_UndoStack.size() - 1;
       m_CaretPosition.Line++;
       m_CaretPosition.Column = 1;
       // Insert newline character to the element in history
-      m_History[historyHead].Content.push_back('\n');
+      m_UndoStack[historyHead].Content.push_back('\n');
       // Update end position
-      m_History[historyHead].PositionEnd.Line = m_CaretPosition.Line;
-      m_History[historyHead].PositionEnd.Column = m_CaretPosition.Column;
+      m_UndoStack[historyHead].PositionEnd.Line = m_CaretPosition.Line;
+      m_UndoStack[historyHead].PositionEnd.Column = m_CaretPosition.Column;
       // Return because we don't need to add newline char in text buffer
     }
     return;
@@ -72,9 +73,9 @@ void TextBuffer::InsertChar(char character) {
   m_CaretPosition.Column++;
 
   // Add/Update history
-  m_History[historyHead].Content.push_back(character);
-  m_History[historyHead].PositionEnd.Line = m_CaretPosition.Line;
-  m_History[historyHead].PositionEnd.Column = m_CaretPosition.Column;
+  m_UndoStack[historyHead].Content.push_back(character);
+  m_UndoStack[historyHead].PositionEnd.Line = m_CaretPosition.Line;
+  m_UndoStack[historyHead].PositionEnd.Column = m_CaretPosition.Column;
 }
 
 void TextBuffer::InsertLine(std::string text) {
@@ -93,9 +94,9 @@ void TextBuffer::Backspace() {
 }
 
 void TextBuffer::Undo() {
-  if (m_History.empty())
+  if (m_UndoStack.empty())
     return;
-  Action mostRecentAction = m_History[m_History.size() - 1];
+  Action mostRecentAction = m_UndoStack[m_UndoStack.size() - 1];
   int numCharToRemove = mostRecentAction.Content.size();
 
   Position positionOfCharToRemove = mostRecentAction.PositionEnd;
@@ -122,16 +123,40 @@ void TextBuffer::Undo() {
 
   assert(positionOfCharToRemove == mostRecentAction.PositionStart);
   m_CaretPosition = positionOfCharToRemove;
-  // Remove most recent action from the stack
-  m_History.pop_back();
+  // Insert the last element into the redo stack
+  m_RedoStack.push_back(m_UndoStack[m_UndoStack.size() - 1]);
+  // Remove most recent action from the undo stack
+  m_UndoStack.pop_back();
 }
 
 void TextBuffer::Redo() {
-  // if (m_History.size() > 0) {
-  //   std::string toRedo = m_History[m_History.size() - 1];
-  //   m_Lines.push_back(toRedo);
-  //   m_History.pop_back();
-  // }
+  if (m_RedoStack.empty()) {
+    return;
+  }
+  Action mostRecentAction = m_RedoStack.back();
+
+  Position positionCharToInsert = mostRecentAction.PositionStart;
+  int numCharToInsert = mostRecentAction.Content.size();
+  std::string stringToInsert = mostRecentAction.Content;
+
+  for (int i = 0; i < numCharToInsert; i++) {
+    int lineIndex = positionCharToInsert.Line - 1;
+    int columnIndex = positionCharToInsert.Column - 1;
+    // If it's a newline character then insert an empty line in the text buffer
+    if(stringToInsert[i] == '\n'){
+        m_Lines.insert(m_Lines.begin() + lineIndex + 1, "");
+        positionCharToInsert.Line++;
+        positionCharToInsert.Column = 1;
+    }
+    else {
+        m_Lines[lineIndex].insert(m_Lines[lineIndex].begin() + columnIndex,
+                              stringToInsert[i]);
+        positionCharToInsert.Column++;
+    }
+  }
+  assert(positionCharToInsert == mostRecentAction.PositionEnd);
+  m_UndoStack.push_back(m_RedoStack.back());
+  m_RedoStack.pop_back();
 }
 
 void TextBuffer::PrintBuffer() {

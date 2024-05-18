@@ -14,12 +14,9 @@ int main() {
   tb.InsertChar('\n');
   tb.InsertChar('\n');
   InsertLine(tb, "This is another test string");
-  InsertLine(tb, "Yet another line");
-  tb.InsertChar('w');
-  tb.InsertChar('o');
-  tb.InsertChar('r');
-  tb.InsertChar('d');
+  InsertLineWithoutNewlineCharacter(tb, "Yet another line");
 
+  std::cout << "Original Text:-" << std::endl;
   PrintLines(tb.GetLines());
 
   std::cout << "------------------------\n";
@@ -40,35 +37,18 @@ int main() {
   tb.Undo();
   tb.Undo();
   tb.Undo();
-  tb.Undo();
-
   std::cout << "After Undo:-" << std::endl;
-
   PrintLines(tb.GetLines());
 
-  // std::cout << caret.Line << " " << caret.Column;
-  // tb.SetCaretPosition({6, 3});
-  // tb.Backspace();
-
-  // tb.Select({2, 6}, {3, 9});
-  // tb.Backspace();
-
-  // Register reg(1);
-  // reg.Insert(tb.GetSelectedText());
-  // std::cout << reg.GetBuffer();
-
-  // PrintLines(tb.GetLines());
-  // PrintHistory(tb.GetHistory());
-  std::cout << "\n------------------------\n";
-  PrintCaretPosition(tb.GetCaretPosition());
-
-  // tb.SetCaretPosition(4, 4);
-
-  // tb.InsertBuffer(reg);
-
-  // editor.Display();
-  // tb.PrintBuffer();
-  // std::cout << reg.GetBuffer();
+  std::cout << "------------------------\n";
+  tb.Redo();
+  std::cout << "After Redo:-" << std::endl;
+  PrintLines(tb.GetLines());
+  std::cout << "------------------------\n";
+  std::cout << "Num elements in undo stack: " << tb.GetNumElementsUndoStack()
+            << std::endl;
+  std::cout << "Num elements in redo stack: " << tb.GetNumElementsRedoStack()
+            << std::endl;
 
   return 0;
 }

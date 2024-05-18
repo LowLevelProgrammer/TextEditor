@@ -17,6 +17,13 @@ inline void InsertLine(TextBuffer &tb, const std::string &line) {
   tb.InsertChar('\n');
 }
 
+inline void InsertLineWithoutNewlineCharacter(TextBuffer &tb,
+                                              const std::string &line) {
+  for (const auto &ch : line) {
+    tb.InsertChar(ch);
+  }
+}
+
 inline std::string GetActionTypeString(ActionType actionType) {
   switch (actionType) {
   case ActionType::Copy:
