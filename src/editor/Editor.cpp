@@ -13,22 +13,7 @@ Editor::Editor() : m_TextBuffer(), m_FileHandler() {
 
 Editor::~Editor() { delete[] (m_Register); }
 
-void Editor::Run() {
-  std::string line;
-  while (true) {
-    std::getline(std::cin, line);
-    if (line.empty())
-      break;
-    m_TextBuffer.InsertLine(line);
-  }
-
-  m_TextBuffer.Backspace();
-  m_TextBuffer.Backspace();
-  m_TextBuffer.Backspace();
-  std::cout << "Text in the buffer\n";
-
-  Display();
-}
+void Editor::InsertChar(char character) { m_TextBuffer.InsertChar(character); }
 
 void Editor::InsertLine(std::string line) { m_TextBuffer.InsertLine(line); }
 

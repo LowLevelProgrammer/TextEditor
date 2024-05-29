@@ -85,10 +85,53 @@ void TextBuffer::InsertLine(std::string text) {
 }
 
 void TextBuffer::Backspace() {
+  int xPos = m_CaretPosition.Column - 2;
+  int yPos = m_CaretPosition.Line - 1;
+
+  // First check if selection is active
   if (m_IsSelected) {
+    // Handles caret position update
     DeleteSelection();
+  }
+  // Else check if the caret is at the very beginning of the document
+  else if ((xPos == -1 && yPos == 0) || m_Lines.empty()) {
+    return;
+  }
+  // Else check if caret is at the very beginning of a line
+  else if (xPos == -1) {
+    int prevLineYOffset = yPos - 1;
+    int prevLineXOffset = m_Lines[prevLineXOffset].size() - 1;
+
+    //
+    // Two cases
+    //
+
+    // There is nothing in the line
+    if (m_Lines[yPos].empty()) {
+      m_Lines.erase(m_Lines.begin() + yPos);
+      SetCaretPosition({prevLineYOffset + 1, prevLineXOffset + 2});
+    }
+    // The lines has characters
+    else {
+      std::string currentLine = m_Lines[yPos];
+      //
+      // Need to move current line to previous line
+      //
+      // Copy current line to the previous line
+      m_Lines[prevLineYOffset].append(currentLine);
+      // Remove current line
+      m_Lines.erase(m_Lines.begin() + yPos);
+
+      //
+      // Set caret position
+      //
+      m_CaretPosition.Line = prevLineYOffset + 1;
+      // Adding 2 because caret should be on the right side of the character
+      m_CaretPosition.Column = prevLineXOffset + 2;
+    }
   } else {
-    m_Lines[m_CaretPosition.Line - 1].erase(m_CaretPosition.Column - 2, 1);
+    m_Lines[yPos].erase(m_Lines[yPos].begin() + xPos);
+    // Update caret position
     m_CaretPosition.Column--;
   }
 }
@@ -143,15 +186,14 @@ void TextBuffer::Redo() {
     int lineIndex = positionCharToInsert.Line - 1;
     int columnIndex = positionCharToInsert.Column - 1;
     // If it's a newline character then insert an empty line in the text buffer
-    if(stringToInsert[i] == '\n'){
-        m_Lines.insert(m_Lines.begin() + lineIndex + 1, "");
-        positionCharToInsert.Line++;
-        positionCharToInsert.Column = 1;
-    }
-    else {
-        m_Lines[lineIndex].insert(m_Lines[lineIndex].begin() + columnIndex,
-                              stringToInsert[i]);
-        positionCharToInsert.Column++;
+    if (stringToInsert[i] == '\n') {
+      m_Lines.insert(m_Lines.begin() + lineIndex + 1, "");
+      positionCharToInsert.Line++;
+      positionCharToInsert.Column = 1;
+    } else {
+      m_Lines[lineIndex].insert(m_Lines[lineIndex].begin() + columnIndex,
+                                stringToInsert[i]);
+      positionCharToInsert.Column++;
     }
   }
   assert(positionCharToInsert == mostRecentAction.PositionEnd);

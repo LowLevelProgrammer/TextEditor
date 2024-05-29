@@ -7,13 +7,16 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Include directories
-include_directories(src/core)
-include_directories(src/io)
-include_directories(src/editor)
+# Libraries
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIR})
 
-# Glob all sourcea and header files recursively
+# Include directories
+include_directories(src/core src/io src/editor src/tui src/application)
+
+# Glob all source and header files recursively
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
 file(GLOB_RECURSE HEADER_FILES "src/*.h")
 
 add_executable(TextEditor ${SOURCE_FILES} ${HEADER_FILES})
+target_link_libraries(TextEditor ${CURSES_LIBRARIES} tinfo)

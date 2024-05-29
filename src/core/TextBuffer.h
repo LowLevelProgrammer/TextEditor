@@ -46,8 +46,7 @@ public:
   // Can Undo
   void DeleteSelection();
 
-  inline std::vector<std::string> GetLines() const { return m_Lines; }
-  inline const std::vector<std::string> &GetLines() { return m_Lines; }
+  inline const std::vector<std::string> &GetLines() const { return m_Lines; }
   inline const Position &GetCaretPosition() const { return m_CaretPosition; }
   inline const std::vector<Action> &GetHistory() const { return m_UndoStack; }
   inline const int GetNumElementsUndoStack() const {
