@@ -4,13 +4,14 @@
 #include "Register.h"
 #include "TextBuffer.h"
 #include <string>
+#include <vector>
 
 class Editor {
 public:
   Editor();
   ~Editor();
 
-  void Run();
+  void InsertChar(char character);
   void InsertLine(std::string line);
   void BackSpace();
   void Select(Position startPosition, Position endPosition);
@@ -24,6 +25,10 @@ public:
   void Save();
   void SaveAs(std::string filePath);
   void Display();
+
+  inline const std::vector<std::string> &GetTextBuffer() const {
+    return m_TextBuffer.GetLines();
+  }
 
 private:
   void HandleInput();
