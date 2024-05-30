@@ -94,41 +94,31 @@ void TextBuffer::Backspace() {
     DeleteSelection();
   }
   // Else check if the caret is at the very beginning of the document
-  else if ((xPos == -1 && yPos == 0) || m_Lines.empty()) {
+  else if (xPos == -1 && yPos == 0) {
     return;
   }
   // Else check if caret is at the very beginning of a line
   else if (xPos == -1) {
     int prevLineYOffset = yPos - 1;
-    int prevLineXOffset = m_Lines[prevLineXOffset].size() - 1;
+    int prevLineXOffset = m_Lines[prevLineYOffset].size() - 1;
+
+    // Need to simply move to the previous line if there's nothing after the
+    // caret
+    // Or need to move every line to the previous line if there is
+    std::string currentLine = m_Lines[yPos];
+
+    // Copy current line to the previous line
+    m_Lines[prevLineYOffset].append(currentLine);
+    // Remove current line
+    m_Lines.erase(m_Lines.begin() + yPos);
 
     //
-    // Two cases
+    // Update caret position
     //
 
-    // There is nothing in the line
-    if (m_Lines[yPos].empty()) {
-      m_Lines.erase(m_Lines.begin() + yPos);
-      SetCaretPosition({prevLineYOffset + 1, prevLineXOffset + 2});
-    }
-    // The lines has characters
-    else {
-      std::string currentLine = m_Lines[yPos];
-      //
-      // Need to move current line to previous line
-      //
-      // Copy current line to the previous line
-      m_Lines[prevLineYOffset].append(currentLine);
-      // Remove current line
-      m_Lines.erase(m_Lines.begin() + yPos);
-
-      //
-      // Set caret position
-      //
-      m_CaretPosition.Line = prevLineYOffset + 1;
-      // Adding 2 because caret should be on the right side of the character
-      m_CaretPosition.Column = prevLineXOffset + 2;
-    }
+    // Add 2 to the x-offset because caret should be on the right side of the
+    // char
+    SetCaretPosition({prevLineYOffset + 1, prevLineXOffset + 2});
   } else {
     m_Lines[yPos].erase(m_Lines[yPos].begin() + xPos);
     // Update caret position

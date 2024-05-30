@@ -9,7 +9,6 @@ void Application::Run() {
 
   while (m_IsRunning) {
     m_TUI.ProcessInput();
-    m_TUI.Update();
     m_TUI.Render();
 
     if (m_TUI.ShouldQuit()) {
