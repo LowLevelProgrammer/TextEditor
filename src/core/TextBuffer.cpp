@@ -84,6 +84,81 @@ void TextBuffer::InsertLine(std::string text) {
   m_CaretPosition.Column = text.size();
 }
 
+// TODO: Refactor with cleaner IsEOF and IsEOL functions
+Position TextBuffer::MoveCaret(Direction direction) {
+  int yPos = m_CaretPosition.Line - 1;
+  int xPos = m_CaretPosition.Column - 1;
+  Position updatedCarentPosition;
+  switch (direction) {
+  case Direction::Up:
+    // If at the fist line then bring the caret to the beginning of the document
+    if (yPos == 0) {
+      m_CaretPosition.Column = 1;
+    }
+    // Else move the caret to the previous line
+    else {
+      m_CaretPosition.Line--;
+      int yPrevLinePos = yPos - 1;
+      int prevLineSize = m_Lines[yPrevLinePos].size();
+      // Check if the previous line is smaller than caret's current position
+      if (m_CaretPosition.Column > prevLineSize + 1) {
+        m_CaretPosition.Column = prevLineSize + 1;
+      }
+      // Else the column position remains as it is
+    }
+    break;
+  case Direction::Down:
+    // If at last line of the document then bring caret to the eof
+    if (yPos == m_Lines.size() - 1) {
+      int currentLineSize = m_Lines[yPos].size();
+      m_CaretPosition.Column = currentLineSize + 1;
+    }
+    // Else move the caret to the next line
+    else {
+      m_CaretPosition.Line++;
+      int yNextLinePos = yPos + 1;
+      int nextLineSize = m_Lines[yNextLinePos].size();
+      // Check if the next line is smaller than caret's current position
+      if (m_CaretPosition.Column > nextLineSize + 1) {
+        m_CaretPosition.Column = nextLineSize + 1;
+      }
+      // Else the column position remains as it is
+    }
+    break;
+  case Direction::Left:
+    // If at the beginning of a line that is not the first line
+    if (m_CaretPosition.Column == 1 && yPos != 0) {
+      int yPrevLinePos = yPos - 1;
+      int prevLineSize = m_Lines[yPrevLinePos].size();
+      m_CaretPosition.Line--;
+      // Add 1 because the caret is at the right of the last character
+      m_CaretPosition.Column = prevLineSize + 1;
+    }
+    // Else if not at the beginning of line (this condition now only applies for
+    // the first line)
+    else if (m_CaretPosition.Column != 1) {
+      m_CaretPosition.Column--;
+    }
+    break;
+  case Direction::Right:
+    int currentLineSize = m_Lines[yPos].size();
+    // If at the end of a line that is the not the last line
+    if (m_CaretPosition.Column == m_Lines[yPos].size() + 1 && !IsEOF()) {
+      m_CaretPosition.Line++;
+      m_CaretPosition.Column = 1;
+    } else if (IsEOF()) {
+      break;
+    } else {
+      m_CaretPosition.Column++;
+    }
+    break;
+  }
+  // Variable just to be explicit about what is being returned
+  updatedCarentPosition = {m_CaretPosition.Line, m_CaretPosition.Column};
+
+  return updatedCarentPosition;
+}
+
 void TextBuffer::Backspace() {
   int xPos = m_CaretPosition.Column - 2;
   int yPos = m_CaretPosition.Line - 1;
@@ -333,4 +408,10 @@ void TextBuffer::InsertBuffer(Register reg) {
   }
 
   m_Lines[line].insert(0, buffer[buffer.size() - 1]);
+}
+
+bool TextBuffer::IsEOF() {
+  int yPos = m_Lines.size() - 1;
+  return (m_CaretPosition.Line == m_Lines.size() &&
+          m_CaretPosition.Column == m_Lines[yPos].size() + 1);
 }

@@ -8,7 +8,6 @@ public:
 
   void Init();
   void ProcessInput();
-  void Update();
   void Render();
   bool ShouldQuit() { return m_QuitFlag; }
 

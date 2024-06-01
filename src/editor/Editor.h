@@ -25,6 +25,11 @@ public:
   void Save();
   void SaveAs(std::string filePath);
   void Display();
+  void MoveCaret(Direction direction);
+
+  inline const Position &GetCaretPosition() const {
+    return m_TextBuffer.GetCaretPosition();
+  }
 
   inline const std::vector<std::string> &GetTextBuffer() const {
     return m_TextBuffer.GetLines();

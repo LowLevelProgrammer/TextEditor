@@ -55,3 +55,7 @@ void Editor::SaveAs(std::string filePath) {
 }
 /* Private Functions */
 void Editor::Display() { m_TextBuffer.PrintBuffer(); }
+
+void Editor::MoveCaret(Direction direction) {
+  m_TextBuffer.MoveCaret(direction);
+}

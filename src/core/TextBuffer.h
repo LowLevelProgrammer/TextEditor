@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+enum class Direction { Left, Right, Up, Down };
+
 struct Position {
   int Line;
   int Column;
@@ -32,6 +34,7 @@ public:
   // Can Undo
   void InsertLine(std::string text);
   // Can Undo
+  Position MoveCaret(Direction direction);
   void Backspace();
   void Undo();
   void Redo();
@@ -45,6 +48,7 @@ public:
   void InsertBuffer(Register reg);
   // Can Undo
   void DeleteSelection();
+  bool IsEOF();
 
   inline const std::vector<std::string> &GetLines() const { return m_Lines; }
   inline const Position &GetCaretPosition() const { return m_CaretPosition; }
