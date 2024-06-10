@@ -15,4 +15,6 @@ void Application::Run() {
       m_IsRunning = false;
     }
   }
+
+  m_TUI.CleanUp();
 }

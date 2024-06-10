@@ -8,18 +8,23 @@ public:
   FileHandler();
   ~FileHandler();
 
-  void CreateFile(std::string filePath);
-  void OpenFile(std::string filePath);
-  TextBuffer ReadFromFile();
-  void WriteToFile(const TextBuffer &textBuffer);
+  TextBuffer Open(std::string filePath);
+  void SaveAs(const TextBuffer &textBuffer, std::string filePath);
+  void SetFilePath(std::string filePath);
+  bool IsOpen();
+  bool IsFileExist(std::string filePath);
   void CloseFile();
 
-  void SetFilePath(std::string filePath);
-  inline bool GetIsOpen() { return m_IsOpen; }
+  inline std::string GetFilePath() { return m_FilePath; }
 
 private:
   // File path includes file name
   std::string m_FilePath;
   std::fstream m_FileStream;
-  bool m_IsOpen = false;
+
+private:
+  void OpenFileForReading(std::string filePath);
+  void OpenFileForWriting(std::string filePath);
+  TextBuffer ReadFromFile();
+  void WriteToFile(const TextBuffer &textBuffer);
 };

@@ -10,6 +10,7 @@ public:
   void ProcessInput();
   void Render();
   bool ShouldQuit() { return m_QuitFlag; }
+  void CleanUp();
 
 private:
   Editor &m_Editor;

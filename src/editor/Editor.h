@@ -26,6 +26,8 @@ public:
   void SaveAs(std::string filePath);
   void Display();
   void MoveCaret(Direction direction);
+  bool IsFileOpen();
+  std::string GetFilePath();
 
   inline const Position &GetCaretPosition() const {
     return m_TextBuffer.GetCaretPosition();

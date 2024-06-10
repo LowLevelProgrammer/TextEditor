@@ -415,3 +415,12 @@ bool TextBuffer::IsEOF() {
   return (m_CaretPosition.Line == m_Lines.size() &&
           m_CaretPosition.Column == m_Lines[yPos].size() + 1);
 }
+
+const Position TextBuffer::GetEOFPosition() const {
+  int yPosLastLine = m_Lines.size() - 1;
+  int lastLineSize = m_Lines[yPosLastLine].size();
+
+  return {yPosLastLine + 1, lastLineSize + 1};
+}
+
+void TextBuffer::Clear() { m_Lines.clear(); }

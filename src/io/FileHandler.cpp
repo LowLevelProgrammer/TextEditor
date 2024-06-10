@@ -4,71 +4,83 @@
 #include <iostream>
 #include <string>
 
-FileHandler::FileHandler() : m_IsOpen(false) {}
+FileHandler::FileHandler() {}
 
 FileHandler::~FileHandler() {}
 
-void FileHandler::CreateFile(std::string p_FilePath) {
-  m_FilePath = p_FilePath;
-  // Check if the file already exists
-  std::filesystem::path filePath(m_FilePath);
-  if (std::filesystem::exists(filePath)) {
-    std::cerr << "Error: File already exists" << std::endl;
-    m_IsOpen = false;
-    return;
+void FileHandler::OpenFileForReading(std::string filePath) {
+
+  if (IsFileExist(filePath)) {
+    m_FilePath = filePath;
+    m_FileStream.open(m_FilePath, std::ios::in);
+  } else {
+    std::cerr << "Error: File path does not exist" << std::endl;
   }
-  // TODO: Add feature to overwrite file if user chooses so
-  m_FileStream.open(m_FilePath, std::ios::out);
-  if (!m_FileStream.is_open()) {
-    std::cerr << "Error: Creating the file" << std::endl;
-    m_IsOpen = false;
-  } else
-    m_IsOpen = true;
 }
 
-void FileHandler::OpenFile(std::string p_FilePath) {
-  // Check if file exists
-  std::filesystem::path filePath(m_FilePath);
-  if (!std::filesystem::exists(filePath)) {
-    std::cerr << "Error: File doesn't exist" << std::endl;
-  }
-
-  m_FileStream.open(filePath);
-
-  if (!m_FileStream.is_open()) {
-    std::cerr << "Error: Could not open the file" << std::endl;
-    m_IsOpen = false;
-  } else
-    m_IsOpen = true;
+// To be used during saving
+void FileHandler::OpenFileForWriting(std::string filePath) {
+  m_FilePath = filePath;
+  m_FileStream.open(m_FilePath, std::ios::out | std::ios::trunc);
 }
 
 TextBuffer FileHandler::ReadFromFile() {
-  std::vector<std::string> lines;
   TextBuffer tb;
-  if (m_IsOpen) {
+  // TODO: Find a better way to handle new text buffers instead of manually
+  // having to call the clear function to remove the initial empty line
+  tb.Clear();
+  if (m_FilePath.empty()) {
+    std::cerr << "Error: No file is opened" << std::endl;
+  } else {
     std::string line;
     while (std::getline(m_FileStream, line)) {
       tb.InsertLine(line);
     }
-  } else {
-    std::cerr << "Error: No file is opened" << std::endl;
   }
+  tb.SetCaretPosition(tb.GetEOFPosition());
   return tb;
 }
 
 void FileHandler::WriteToFile(const TextBuffer &textBuffer) {
-  if (m_IsOpen) {
-    const std::vector<std::string> &lines = textBuffer.GetLines();
-    for (int i = 0; i < lines.size(); i++) {
-      m_FileStream << lines[i] << '\n';
+  const std::vector<std::string> &lines = textBuffer.GetLines();
+  for (int i = 0; i < lines.size(); i++) {
+    m_FileStream << lines[i];
+    if (i != lines.size() - 1) {
+      m_FileStream << '\n';
     }
-  } else
-    std::cerr << "Error: No file is opened" << std::endl;
+  }
+  m_FileStream.flush();
+}
+
+TextBuffer FileHandler::Open(std::string filePath) {
+  OpenFileForReading(filePath);
+  // TODO: Optimize copying this text buffer
+  TextBuffer tb = ReadFromFile();
+  CloseFile();
+  return tb;
+}
+
+void FileHandler::SaveAs(const TextBuffer &textBuffer, std::string filePath) {
+  OpenFileForWriting(filePath);
+  WriteToFile(textBuffer);
+  CloseFile();
+}
+
+bool FileHandler::IsOpen() { return !m_FilePath.empty(); }
+
+bool FileHandler::IsFileExist(std::string filePath) {
+  std::filesystem::path path(filePath);
+  if (std::filesystem::exists(filePath)) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void FileHandler::CloseFile() {
-  m_FileStream.close();
-  if (m_FileStream.fail()) {
-    std::cerr << "Error: Closing the file" << std::endl;
+  if (m_FileStream.is_open()) {
+    m_FileStream.close();
+  } else {
+    std::cerr << "Error: No file to close" << std::endl;
   }
 }

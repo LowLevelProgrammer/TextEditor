@@ -1,6 +1,5 @@
 #include "Editor.h"
 
-#include <iostream>
 #include <string>
 
 Editor::Editor() : m_TextBuffer(), m_FileHandler() {
@@ -41,17 +40,15 @@ void Editor::Paste(int registerNumber) {
 }
 
 void Editor::OpenFile(std::string filePath) {
-  m_FileHandler.OpenFile(filePath);
-  m_TextBuffer = m_FileHandler.ReadFromFile();
+  m_TextBuffer = m_FileHandler.Open(filePath);
 }
 void Editor::Save() {
-  if (!m_FileHandler.GetIsOpen())
-    std::cerr << "Error: No file to save to" << std::endl;
-  m_FileHandler.WriteToFile(m_TextBuffer);
+  // if (!m_FileHandler.GetIsOpen())
+  //   std::cerr << "Error: No file to save to" << std::endl;
+  // m_FileHandler.WriteToFile(m_TextBuffer);
 }
 void Editor::SaveAs(std::string filePath) {
-  m_FileHandler.CreateFile(filePath);
-  m_FileHandler.WriteToFile(m_TextBuffer);
+  m_FileHandler.SaveAs(m_TextBuffer, filePath);
 }
 /* Private Functions */
 void Editor::Display() { m_TextBuffer.PrintBuffer(); }
@@ -59,3 +56,7 @@ void Editor::Display() { m_TextBuffer.PrintBuffer(); }
 void Editor::MoveCaret(Direction direction) {
   m_TextBuffer.MoveCaret(direction);
 }
+
+bool Editor::IsFileOpen() { return m_FileHandler.IsOpen(); }
+
+std::string Editor::GetFilePath() { return m_FileHandler.GetFilePath(); }

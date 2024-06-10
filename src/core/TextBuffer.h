@@ -49,6 +49,8 @@ public:
   // Can Undo
   void DeleteSelection();
   bool IsEOF();
+  const Position GetEOFPosition() const;
+  void Clear();
 
   inline const std::vector<std::string> &GetLines() const { return m_Lines; }
   inline const Position &GetCaretPosition() const { return m_CaretPosition; }
