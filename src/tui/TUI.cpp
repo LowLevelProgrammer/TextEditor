@@ -92,6 +92,12 @@ void TUI::HandleKeyPress(int key) {
     std::string fileName = GetStringInput(y - 1, 24);
     m_Editor.OpenFile(fileName);
   } break;
+  case ctrl('z'):
+    m_Editor.Undo();
+    break;
+  case ctrl('y'):
+    m_Editor.Redo();
+    break;
   case KEY_BACKSPACE:
   case 127:
   case 8:

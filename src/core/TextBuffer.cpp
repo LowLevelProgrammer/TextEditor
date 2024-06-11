@@ -262,6 +262,7 @@ void TextBuffer::Redo() {
     }
   }
   assert(positionCharToInsert == mostRecentAction.PositionEnd);
+  m_CaretPosition = mostRecentAction.PositionEnd;
   m_UndoStack.push_back(m_RedoStack.back());
   m_RedoStack.pop_back();
 }
