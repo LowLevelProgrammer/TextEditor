@@ -18,4 +18,5 @@ private:
 
 private:
   void HandleKeyPress(int key);
+  void DisableFlowControl();
 };

@@ -1,13 +1,11 @@
 #include "TUI.h"
 
-#include <cctype>
-#include <csignal>
-#include <cstdlib>
 #include <ncurses.h>
-#include <string>
-#include <vector>
+#include <termios.h>
+#include <unistd.h>
 
 #define ctrl(x) (x & 0x1F)
+#define KEY_ESCAPE 27
 
 TUI::TUI(Editor &editor) : m_Editor(editor), m_QuitFlag(false) {}
 
@@ -15,9 +13,10 @@ TUI::~TUI() { endwin(); }
 
 void TUI::Init() {
   initscr();
-  raw();
+  cbreak();
   keypad(stdscr, TRUE);
   noecho();
+  DisableFlowControl();
 }
 void TUI::ProcessInput() {
   int ch = getch();
@@ -64,8 +63,7 @@ std::string GetStringInput(int startY, int startX) {
 
 void TUI::HandleKeyPress(int key) {
   switch (key) {
-  case ctrl('c'):
-  case 27:
+  case KEY_ESCAPE:
     m_QuitFlag = true;
     break;
   case ctrl('r'): {
@@ -92,7 +90,7 @@ void TUI::HandleKeyPress(int key) {
     std::string fileName = GetStringInput(y - 1, 24);
     m_Editor.OpenFile(fileName);
   } break;
-  case ctrl('z'):
+  case ctrl('u'):
     m_Editor.Undo();
     break;
   case ctrl('y'):
@@ -122,3 +120,12 @@ void TUI::HandleKeyPress(int key) {
 }
 
 void TUI::CleanUp() { endwin(); }
+
+void TUI::DisableFlowControl() {
+  struct termios tty;
+  tcgetattr(STDIN_FILENO, &tty);
+
+  tty.c_iflag &= ~(IXON | IXOFF); // Disable XON/XOFF flow control
+
+  tcsetattr(STDIN_FILENO, TCSANOW, &tty);
+}
