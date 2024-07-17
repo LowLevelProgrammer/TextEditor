@@ -15,67 +15,32 @@ TextBuffer::TextBuffer()
 TextBuffer::~TextBuffer() {}
 
 void TextBuffer::InsertChar(char character) {
-  // TODO: Check for valid caret position
-  int historyHead = m_UndoStack.size() - 1;
-  int contentHead = m_UndoStack[historyHead].Content.size() - 1;
-  // If the character is a space
-  // If it's the first space then add a new action element in history
-  // else append to existing action
-  if (character == ' ' &&
-      m_UndoStack[historyHead].Content[contentHead] != ' ') {
-    // Add new history element
-    m_UndoStack.push_back({ActionType::Insert,
-                           "",
-                           {m_CaretPosition.Line, m_CaretPosition.Column},
-                           {m_CaretPosition.Line, m_CaretPosition.Column}});
-    historyHead = m_UndoStack.size() - 1;
-    contentHead = 1;
+  int yOffset = m_CaretPosition.Line - 1;
+  int xOffset = m_CaretPosition.Column - 1;
+  switch (character) {
+  case '\n': {
+    // String to move to the new line
+    // |
+    // L__ Empty string incase caret is at EOL
+    // L__ Else rest of the string is moved to the new line
+    std::string stringToMove = m_Lines[yOffset].substr(xOffset);
+    m_Lines.insert(m_Lines.begin() + yOffset + 1, stringToMove);
+
+    // Remove the string from the current line
+    m_Lines[yOffset].erase(xOffset);
+
+    m_CaretPosition.Line++;
+    m_CaretPosition.Column = 1;
+  } break;
+  case ' ':
+    m_Lines[yOffset].insert(m_Lines[yOffset].begin() + xOffset, ' ');
+    m_CaretPosition.Column++;
+    break;
+  default:
+    m_Lines[yOffset].insert(m_Lines[yOffset].begin() + xOffset, character);
+    m_CaretPosition.Column++;
+    break;
   }
-  // If a newline character then always add an element to text buffer
-  else if (character == '\n') {
-    // Add new element to text buffer
-    m_Lines.push_back({});
-
-    // If first newline character then add new element history
-    // Else if consecutive newline then append to last action
-    if (m_UndoStack[historyHead].Content[contentHead] == '\n') {
-      // Append in consecutive newline chars
-      m_UndoStack[historyHead].Content.push_back('\n');
-      m_UndoStack[historyHead].PositionEnd.Column = 1;
-
-      // Update Caret Position
-      m_CaretPosition.Line++;
-      m_CaretPosition.Column = 1;
-
-    } else {
-      // Add new element to history
-      m_UndoStack.push_back({ActionType::Insert,
-                             "",
-                             {m_CaretPosition.Line, m_CaretPosition.Column},
-                             {m_CaretPosition.Line, m_CaretPosition.Column}});
-
-      historyHead = m_UndoStack.size() - 1;
-      m_CaretPosition.Line++;
-      m_CaretPosition.Column = 1;
-      // Insert newline character to the element in history
-      m_UndoStack[historyHead].Content.push_back('\n');
-      // Update end position
-      m_UndoStack[historyHead].PositionEnd.Line = m_CaretPosition.Line;
-      m_UndoStack[historyHead].PositionEnd.Column = m_CaretPosition.Column;
-      // Return because we don't need to add newline char in text buffer
-    }
-    return;
-  }
-  // Insert to text buffer
-  int currentLine = m_CaretPosition.Line - 1;
-  int lineOffset = m_CaretPosition.Column - 1;
-  m_Lines[currentLine].insert(lineOffset, 1, character);
-  m_CaretPosition.Column++;
-
-  // Add/Update history
-  m_UndoStack[historyHead].Content.push_back(character);
-  m_UndoStack[historyHead].PositionEnd.Line = m_CaretPosition.Line;
-  m_UndoStack[historyHead].PositionEnd.Column = m_CaretPosition.Column;
 }
 
 void TextBuffer::InsertLine(std::string text) {
