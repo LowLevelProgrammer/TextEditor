@@ -1,3 +1,5 @@
+#pragma once
+
 #include "TextBuffer.h"
 #include <iostream>
 #include <string>
@@ -24,41 +26,42 @@ inline void InsertLineWithoutNewlineCharacter(TextBuffer &tb,
   }
 }
 
-inline std::string GetActionTypeString(ActionType actionType) {
-  switch (actionType) {
-  case ActionType::Copy:
-    return "Copy";
-  case ActionType::Paste:
-    return "Paste";
-  case ActionType::Insert:
-    return "Insert";
-  case ActionType::Delete:
-    return "Delete";
-  default:
-    return "";
-  }
+inline std::string GetPrintableString(char character) {
+  if (character == '\n')
+    return "\\n";
+  else
+    return std::string(1, character);
 }
 
-inline std::string GetPrintableString(std::string content) {
-  std::string str;
-  for (auto ch : content) {
-    if (ch == '\n')
-      str.append("\\n");
-    else if (ch == ' ')
-      str.append("_");
-    else
-      str.push_back(ch);
+inline std::string GetOperationTypeString(OperationType type) {
+  switch (type) {
+  case OperationType::InsertChar:
+    return "Add";
+  case OperationType::RemoveChar:
+    return "Remove";
+  case OperationType::InsertNewLine:
+    return "Newline";
   }
-  return str;
+  std::cerr << "Invalid operation type" << std::endl;
+  exit(-1);
 }
 
-inline void PrintHistory(const std::vector<Action> &history) {
-  for (const auto &ele : history) {
-    std::string printableString = GetPrintableString(ele.Content);
-    std::cout << GetActionTypeString(ele.Type) << " \"" << printableString
-              << "\" { " << ele.PositionStart.Line << ", "
-              << ele.PositionStart.Column << " }, { " << ele.PositionEnd.Line
-              << ", " << ele.PositionEnd.Column << " }" << std::endl;
+inline void PrintTransaction(Transaction transaction) {
+  int numOperations = transaction.Operations.size();
+  std::cout << "Transaction Size: " << numOperations << std::endl;
+
+  for (Operation operation : transaction.Operations) {
+    std::cout << "{ " << GetOperationTypeString(operation.Type) << ", '"
+              << GetPrintableString(operation.Character) << "', "
+              << operation.YOffset << ", " << operation.XOffset << " }";
+  }
+  std::cout << std::endl;
+}
+
+inline void PrintUndoStack(const std::vector<Transaction> &undoStack) {
+  std::cout << "Undo Stack:-" << std::endl;
+  for (Transaction trnxn : undoStack) {
+    PrintTransaction(trnxn);
   }
 }
 

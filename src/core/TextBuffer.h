@@ -15,13 +15,19 @@ struct Position {
   }
 };
 
-enum class ActionType { Insert, Delete, Copy, Paste };
+enum class OperationType { InsertChar, RemoveChar, InsertNewLine };
 
-struct Action {
-  ActionType Type;
-  std::string Content;
-  Position PositionStart;
-  Position PositionEnd;
+struct Operation {
+  OperationType Type;
+  char Character;
+  int YOffset;
+  int XOffset;
+};
+
+struct Transaction {
+  std::vector<Operation> Operations;
+  void Clear() { Operations.clear(); }
+  bool Empty() { return Operations.empty(); }
 };
 
 class TextBuffer {
@@ -54,12 +60,11 @@ public:
 
   inline const std::vector<std::string> &GetLines() const { return m_Lines; }
   inline const Position &GetCaretPosition() const { return m_CaretPosition; }
-  inline const std::vector<Action> &GetHistory() const { return m_UndoStack; }
-  inline const int GetNumElementsUndoStack() const {
-    return m_UndoStack.size();
+  inline const Transaction &GetCurrentTransaction() const {
+    return m_CurrentTransaction;
   }
-  inline const int GetNumElementsRedoStack() const {
-    return m_RedoStack.size();
+  inline const std::vector<Transaction> &GetUndoStack() const {
+    return m_UndoStack;
   }
 
 private:
@@ -71,9 +76,15 @@ private:
   // TODO: Check file bounds before any caret position setting operation
   // everywhere
   Position m_FileEnd;
-  std::vector<Action> m_UndoStack;
-  std::vector<Action> m_RedoStack;
+  Transaction m_CurrentTransaction;
+  bool m_InTransaction = false;
+  std::vector<Transaction> m_UndoStack;
+  char m_LastCharacter = '\0';
 
 private:
   std::pair<Position, Position> DetermineEnds();
+  void StartTransaction();
+  void StopTransaction();
+  void CommitTransaction();
+  void AddOperation(const Operation &operation);
 };

@@ -10,13 +10,31 @@ TextBuffer::TextBuffer()
       m_IsSelected(false) {
   m_Lines.clear();
   m_Lines.push_back({});
-  m_UndoStack.push_back({.PositionStart = {1, 1}, .PositionEnd = {1, 1}});
 }
 TextBuffer::~TextBuffer() {}
 
 void TextBuffer::InsertChar(char character) {
   int yOffset = m_CaretPosition.Line - 1;
   int xOffset = m_CaretPosition.Column - 1;
+
+  Operation op;
+  op.YOffset = yOffset;
+  op.XOffset = xOffset;
+  op.Character = character;
+
+  // If first of 'space' or 'newline' char of consecutive sequence of such chars
+  // then end the current transaction and start a new one
+  if (!m_InTransaction || (character == ' ' && m_LastCharacter != ' ') ||
+      (character == '\n' && m_LastCharacter != '\n')) {
+    // If already in transaction then it has entered the condition because its
+    // either a first "space" or a "newline" char
+    // In which case have to stop the current transaction
+    if (m_InTransaction) {
+      StopTransaction();
+    }
+    StartTransaction();
+  }
+
   switch (character) {
   case '\n': {
     // String to move to the new line
@@ -31,16 +49,29 @@ void TextBuffer::InsertChar(char character) {
 
     m_CaretPosition.Line++;
     m_CaretPosition.Column = 1;
+
+    // Record the Operation
+    op.Type = OperationType::InsertNewLine;
   } break;
   case ' ':
     m_Lines[yOffset].insert(m_Lines[yOffset].begin() + xOffset, ' ');
     m_CaretPosition.Column++;
+
+    op.Type = OperationType::InsertChar;
     break;
   default:
     m_Lines[yOffset].insert(m_Lines[yOffset].begin() + xOffset, character);
     m_CaretPosition.Column++;
+    op.Type = OperationType::InsertChar;
     break;
   }
+
+  AddOperation(op);
+
+  CommitTransaction();
+
+  // Update last character
+  m_LastCharacter = character;
 }
 
 void TextBuffer::InsertLine(std::string text) {
@@ -166,71 +197,9 @@ void TextBuffer::Backspace() {
   }
 }
 
-void TextBuffer::Undo() {
-  if (m_UndoStack.empty())
-    return;
-  Action mostRecentAction = m_UndoStack[m_UndoStack.size() - 1];
-  int numCharToRemove = mostRecentAction.Content.size();
+void TextBuffer::Undo() {}
 
-  Position positionOfCharToRemove = mostRecentAction.PositionEnd;
-  // Compensate because the caret is on the right of the character
-  positionOfCharToRemove.Column--;
-  while (numCharToRemove) {
-    // Removes newline "character"
-    if (m_Lines[positionOfCharToRemove.Line - 1].size() == 0) {
-      m_Lines.erase(m_Lines.begin() + positionOfCharToRemove.Line - 1);
-      positionOfCharToRemove.Line--;
-      positionOfCharToRemove.Column =
-          m_Lines[positionOfCharToRemove.Line - 1].size();
-    }
-    // Removes any other character
-    else {
-      m_Lines[positionOfCharToRemove.Line - 1].erase(
-          positionOfCharToRemove.Column - 1, 1);
-      positionOfCharToRemove.Column--;
-    }
-    numCharToRemove--;
-  }
-  // Compensate as caret will be on the right side of the character
-  positionOfCharToRemove.Column++;
-
-  assert(positionOfCharToRemove == mostRecentAction.PositionStart);
-  m_CaretPosition = positionOfCharToRemove;
-  // Insert the last element into the redo stack
-  m_RedoStack.push_back(m_UndoStack[m_UndoStack.size() - 1]);
-  // Remove most recent action from the undo stack
-  m_UndoStack.pop_back();
-}
-
-void TextBuffer::Redo() {
-  if (m_RedoStack.empty()) {
-    return;
-  }
-  Action mostRecentAction = m_RedoStack.back();
-
-  Position positionCharToInsert = mostRecentAction.PositionStart;
-  int numCharToInsert = mostRecentAction.Content.size();
-  std::string stringToInsert = mostRecentAction.Content;
-
-  for (int i = 0; i < numCharToInsert; i++) {
-    int lineIndex = positionCharToInsert.Line - 1;
-    int columnIndex = positionCharToInsert.Column - 1;
-    // If it's a newline character then insert an empty line in the text buffer
-    if (stringToInsert[i] == '\n') {
-      m_Lines.insert(m_Lines.begin() + lineIndex + 1, "");
-      positionCharToInsert.Line++;
-      positionCharToInsert.Column = 1;
-    } else {
-      m_Lines[lineIndex].insert(m_Lines[lineIndex].begin() + columnIndex,
-                                stringToInsert[i]);
-      positionCharToInsert.Column++;
-    }
-  }
-  assert(positionCharToInsert == mostRecentAction.PositionEnd);
-  m_CaretPosition = mostRecentAction.PositionEnd;
-  m_UndoStack.push_back(m_RedoStack.back());
-  m_RedoStack.pop_back();
-}
+void TextBuffer::Redo() {}
 
 void TextBuffer::PrintBuffer() {
   for (auto line : m_Lines) {
@@ -390,3 +359,30 @@ const Position TextBuffer::GetEOFPosition() const {
 }
 
 void TextBuffer::Clear() { m_Lines.clear(); }
+
+void TextBuffer::StartTransaction() {
+  m_InTransaction = true;
+  m_UndoStack.push_back({});
+}
+
+void TextBuffer::StopTransaction() {
+  if (m_InTransaction && !m_CurrentTransaction.Empty()) {
+    m_InTransaction = false;
+    m_CurrentTransaction.Clear();
+  } else {
+    std::cerr << "Error: Invalid time to stop transaction" << std::endl;
+  }
+}
+
+void TextBuffer::CommitTransaction() {
+  if (m_UndoStack.empty()) {
+    std::cerr << "Error in undo system" << std::endl;
+    exit(-1);
+  }
+  Transaction &mostRecentTransaction = m_UndoStack.back();
+  mostRecentTransaction = m_CurrentTransaction;
+}
+
+void TextBuffer::AddOperation(const Operation &operation) {
+  m_CurrentTransaction.Operations.push_back(operation);
+}
