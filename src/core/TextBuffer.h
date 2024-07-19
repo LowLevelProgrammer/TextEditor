@@ -41,7 +41,7 @@ public:
   void InsertLine(std::string text);
   // Can Undo
   Position MoveCaret(Direction direction);
-  void Backspace();
+  void RemoveCharAtCaret();
   void Undo();
   void Redo();
   void PrintBuffer();

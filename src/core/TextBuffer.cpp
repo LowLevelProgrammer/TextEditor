@@ -155,7 +155,7 @@ Position TextBuffer::MoveCaret(Direction direction) {
   return updatedCarentPosition;
 }
 
-void TextBuffer::Backspace() {
+void TextBuffer::RemoveCharAtCaret() {
   int xPos = m_CaretPosition.Column - 2;
   int yPos = m_CaretPosition.Line - 1;
 
@@ -197,7 +197,33 @@ void TextBuffer::Backspace() {
   }
 }
 
-void TextBuffer::Undo() {}
+void TextBuffer::Undo() {
+  if (!m_UndoStack.empty()) {
+    Transaction trnxn = m_UndoStack.back();
+    m_UndoStack.pop_back();
+    StopTransaction();
+    m_LastCharacter = '\0';
+
+    for (auto it = trnxn.Operations.rbegin(); it != trnxn.Operations.rend();
+         it++) {
+      Operation op = *it;
+      switch (op.Type) {
+      case OperationType::InsertChar:
+        // Implement reverse of insert char i.e. delete char
+        // int yOffset = op.YOffset;
+        // int xOffset = op.XOffset;
+        // m_Lines[yOffset].erase(m_Lines[yOffset].begin() + xOffset);
+        RemoveCharAtCaret();
+        break;
+      case OperationType::RemoveChar:
+        break;
+      case OperationType::InsertNewLine:
+        RemoveCharAtCaret();
+        break;
+      }
+    }
+  }
+}
 
 void TextBuffer::Redo() {}
 
@@ -376,7 +402,8 @@ void TextBuffer::StopTransaction() {
 
 void TextBuffer::CommitTransaction() {
   if (m_UndoStack.empty()) {
-    std::cerr << "Error in undo system" << std::endl;
+    std::cerr << "Error in undo system: Commit when undo stack is empty"
+              << std::endl;
     exit(-1);
   }
   Transaction &mostRecentTransaction = m_UndoStack.back();

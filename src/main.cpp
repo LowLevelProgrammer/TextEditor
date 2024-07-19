@@ -1,10 +1,6 @@
-#include "TextBuffer.h"
-#include "utilities.h"
+#include "Application.h"
 
 int main() {
-  TextBuffer tb;
-  InsertLine(tb, "Hello, World!");
-  InsertLineWithoutNewlineCharacter(tb, "I'm Akash");
-
-  PrintUndoStack(tb.GetUndoStack());
+  Application app;
+  app.Run();
 }
