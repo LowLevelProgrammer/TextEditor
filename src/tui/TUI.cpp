@@ -24,16 +24,20 @@ void TUI::ProcessInput() {
   int ch = getch();
   HandleKeyPress(ch);
 }
-void TUI::Render() {
+
+void TUI::Clear() { clear(); }
+
+void TUI::Draw() {
   const std::vector<std::string> &textBuffer = m_Editor.GetTextBuffer();
 
-  clear();
   for (int i = 0; i < textBuffer.size(); i++) {
     mvprintw(i, 0, "%s", textBuffer[i].c_str());
   }
   auto [y, x] = m_Editor.GetCaretPosition();
   move(y - 1, x - 1);
 }
+
+void TUI::Refresh() { refresh(); }
 
 std::optional<std::string> GetStringInput(int startY, int startX) {
   std::string input;

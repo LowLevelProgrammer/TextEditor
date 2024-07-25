@@ -8,7 +8,9 @@ public:
 
   void Init();
   void ProcessInput();
-  void Render();
+  void Clear();
+  void Draw();
+  void Refresh();
   bool ShouldQuit() { return m_QuitFlag; }
   void CleanUp();
 
