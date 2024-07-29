@@ -21,6 +21,7 @@ void Application::Draw() {
 void Application::Refresh() {
   m_TUI.Refresh();
   wrefresh(win);
+  m_TUI.RefreshCursor();
 }
 
 void Application::Run() {

@@ -19,25 +19,33 @@ void TUI::Init() {
   keypad(stdscr, TRUE);
   noecho();
   DisableFlowControl();
+
+  int rows, cols;
+  getmaxyx(stdscr, rows, cols);
+
+  m_Window.CreateWindow(rows, cols / 2, 0, 0);
 }
 void TUI::ProcessInput() {
-  int ch = getch();
+  int ch = wgetch(m_Window.GetWin());
   HandleKeyPress(ch);
 }
 
-void TUI::Clear() { clear(); }
+void TUI::Clear() { wclear(m_Window.GetWin()); }
 
 void TUI::Draw() {
   const std::vector<std::string> &textBuffer = m_Editor.GetTextBuffer();
 
   for (int i = 0; i < textBuffer.size(); i++) {
-    mvprintw(i, 0, "%s", textBuffer[i].c_str());
+    m_Window.DrawLine(textBuffer[i], i);
   }
-  auto [y, x] = m_Editor.GetCaretPosition();
-  move(y - 1, x - 1);
 }
 
-void TUI::Refresh() { refresh(); }
+void TUI::Refresh() { m_Window.Refresh(); }
+
+void TUI::RefreshCursor() {
+  auto [y, x] = m_Editor.GetCaretPosition();
+  wmove(m_Window.GetWin(), y - 1, x - 1);
+}
 
 std::optional<std::string> GetStringInput(int startY, int startX) {
   std::string input;
