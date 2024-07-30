@@ -14,7 +14,7 @@ public:
 
   inline WINDOW *GetWin() { return m_Win; }
 
-private:
+protected:
   WINDOW *m_Win;
   int m_Height, m_Width, m_StartY, m_StartX;
 };

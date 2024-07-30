@@ -2,6 +2,7 @@
 
 #include "TextBuffer.h"
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -46,6 +47,20 @@ inline std::string GetOperationTypeString(OperationType type) {
   exit(-1);
 }
 
+inline std::string GetTransactionString(Transaction transaction) {
+  int numOperations = transaction.Operations.size();
+  std::stringstream ss;
+  ss << "Transaction Size: " << numOperations << std::endl;
+
+  for (Operation operation : transaction.Operations) {
+    ss << "{ " << GetOperationTypeString(operation.Type) << ", '"
+       << GetPrintableString(operation.Character) << "', " << operation.YOffset
+       << ", " << operation.XOffset << " }";
+  }
+  ss << std::endl;
+  return ss.str();
+}
+
 inline void PrintTransaction(Transaction transaction) {
   int numOperations = transaction.Operations.size();
   std::cout << "Transaction Size: " << numOperations << std::endl;
@@ -56,6 +71,16 @@ inline void PrintTransaction(Transaction transaction) {
               << operation.YOffset << ", " << operation.XOffset << " }";
   }
   std::cout << std::endl;
+}
+
+inline std::string
+GetUndoStackString(const std::vector<Transaction> &undoStack) {
+  std::stringstream ss;
+  ss << "Undo Stack:-" << std::endl;
+  for (Transaction trnxn : undoStack) {
+    ss << GetTransactionString(trnxn);
+  }
+  return ss.str();
 }
 
 inline void PrintUndoStack(const std::vector<Transaction> &undoStack) {

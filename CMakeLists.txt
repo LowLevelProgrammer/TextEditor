@@ -12,11 +12,10 @@ find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 
 # Include directories
-include_directories(src/core src/io src/editor src/tui src/application)
+include_directories(src/core src/io src/editor src/tui src/application src/)
 
 # Glob all source and header files recursively
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
-file(GLOB_RECURSE HEADER_FILES "src/*.h")
 
-add_executable(TextEditor ${SOURCE_FILES} ${HEADER_FILES})
+add_executable(TextEditor ${SOURCE_FILES})
 target_link_libraries(TextEditor ${CURSES_LIBRARIES} tinfo)
