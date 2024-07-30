@@ -19,7 +19,7 @@ public:
 private:
   Editor &m_Editor;
   bool m_QuitFlag;
-  Window m_Window;
+  Window* m_Window;
 
 private:
   void HandleKeyPress(int key);

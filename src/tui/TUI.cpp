@@ -23,28 +23,28 @@ void TUI::Init() {
   int rows, cols;
   getmaxyx(stdscr, rows, cols);
 
-  m_Window.CreateWindow(rows, cols / 2, 0, 0);
+  m_Window = new Window(rows, cols / 2, 0, 0);
 }
 void TUI::ProcessInput() {
-  int ch = wgetch(m_Window.GetWin());
+  int ch = wgetch(m_Window->GetWin());
   HandleKeyPress(ch);
 }
 
-void TUI::Clear() { wclear(m_Window.GetWin()); }
+void TUI::Clear() { m_Window->Clear(); }
 
 void TUI::Draw() {
   const std::vector<std::string> &textBuffer = m_Editor.GetTextBuffer();
 
   for (int i = 0; i < textBuffer.size(); i++) {
-    m_Window.DrawLine(textBuffer[i], i);
+    m_Window->DrawLine(textBuffer[i], i);
   }
 }
 
-void TUI::Refresh() { m_Window.Refresh(); }
+void TUI::Refresh() { m_Window->Refresh(); }
 
 void TUI::RefreshCursor() {
   auto [y, x] = m_Editor.GetCaretPosition();
-  wmove(m_Window.GetWin(), y - 1, x - 1);
+  wmove(m_Window->GetWin(), y - 1, x - 1);
 }
 
 std::optional<std::string> GetStringInput(int startY, int startX) {

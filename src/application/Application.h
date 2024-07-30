@@ -2,7 +2,7 @@
 
 #include "Editor.h"
 #include "TUI.h"
-#include <ncurses.h>
+#include "Window.h"
 
 class Application {
 public:
@@ -17,7 +17,7 @@ public:
 
 private:
   Editor m_Editor;
-  TUI m_TUI;
-  WINDOW *win;
+  TUI m_MainWindow;
+  Window *m_SecondaryWindow;
   bool m_IsRunning;
 };

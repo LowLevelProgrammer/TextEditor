@@ -1,39 +1,36 @@
 #include "Application.h"
-#include <ncurses.h>
+#include "BoxedWindow.h"
 
-Application::Application() : m_TUI(m_Editor), m_IsRunning(true) {}
-
-Application::~Application() {}
-
-void Application::ProcessInput() { m_TUI.ProcessInput(); }
-
-void Application::Clear() { m_TUI.Clear(); }
-
-void Application::Draw() {
-  // Window content
-  wclear(win);
-  box(win, 0, 0);
-  mvwprintw(win, 1, 1, "%s", "Updated content");
-
-  m_TUI.Draw();
-}
-
-void Application::Refresh() {
-  m_TUI.Refresh();
-  wrefresh(win);
-  m_TUI.RefreshCursor();
-}
-
-void Application::Run() {
-  m_TUI.Init();
+Application::Application() : m_MainWindow(m_Editor), m_IsRunning(true) {
+  m_MainWindow.Init();
 
   int rows, cols;
   getmaxyx(stdscr, rows, cols);
-  win = newwin(rows, cols / 2, 0, cols / 2);
-  wclear(win);
-  box(win, 0, 0);
-  mvwprintw(win, 1, 1, "%s", "Right Half window");
-  wrefresh(win);
+
+  m_SecondaryWindow = new BoxedWindow(rows, cols / 2, 0, cols / 2);
+}
+
+Application::~Application() {}
+
+void Application::ProcessInput() { m_MainWindow.ProcessInput(); }
+
+void Application::Clear() {
+  m_MainWindow.Clear();
+  m_SecondaryWindow->Clear();
+}
+
+void Application::Draw() {
+  m_MainWindow.Draw();
+  m_SecondaryWindow->Draw("Secondary window content");
+}
+
+void Application::Refresh() {
+  m_SecondaryWindow->Refresh();
+  m_MainWindow.Refresh();
+  m_MainWindow.RefreshCursor();
+}
+
+void Application::Run() {
 
   while (m_IsRunning) {
     ProcessInput();
@@ -41,10 +38,10 @@ void Application::Run() {
     Draw();
     Refresh();
 
-    if (m_TUI.ShouldQuit()) {
+    if (m_MainWindow.ShouldQuit()) {
       m_IsRunning = false;
     }
   }
 
-  m_TUI.CleanUp();
+  m_MainWindow.CleanUp();
 }

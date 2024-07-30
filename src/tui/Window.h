@@ -4,10 +4,10 @@
 #include <string>
 class Window {
 public:
-  Window();
+  Window(int h, int w, int y, int x);
   virtual ~Window();
 
-  void CreateWindow(int h, int w, int y, int x);
+  void Clear();
   void DrawLine(const std::string &content, int y);
   virtual void Draw(const std::string &content);
   virtual void Refresh();
