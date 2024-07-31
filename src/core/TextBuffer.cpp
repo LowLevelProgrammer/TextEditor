@@ -207,18 +207,18 @@ void TextBuffer::Undo() {
     for (auto it = trnxn.Operations.rbegin(); it != trnxn.Operations.rend();
          it++) {
       Operation op = *it;
+      int yOffset = op.YOffset;
+      int xOffset = op.XOffset;
       switch (op.Type) {
       case OperationType::InsertChar:
-        // Implement reverse of insert char i.e. delete char
-        // int yOffset = op.YOffset;
-        // int xOffset = op.XOffset;
-        // m_Lines[yOffset].erase(m_Lines[yOffset].begin() + xOffset);
-        RemoveCharAtCaret();
+        RemoveCharAtOffset(yOffset, xOffset);
+        SetCaretPosition({yOffset + 1, xOffset + 1});
         break;
       case OperationType::RemoveChar:
         break;
       case OperationType::InsertNewLine:
-        RemoveCharAtCaret();
+        RemoveNewlineCharAtOffset(yOffset);
+        SetCaretPosition({yOffset + 1, xOffset + 1});
         break;
       }
     }
@@ -309,6 +309,39 @@ void TextBuffer::DeleteSelection() {
   }
   m_IsSelected = false;
   m_CaretPosition = start;
+}
+
+void TextBuffer::RemoveNewlineCharAtOffset(int yOffset) {
+  // In this case have to move the next (yOffset + 1)th line to yOffset
+  int nextLineYOffset = yOffset + 1;
+
+  if (yOffset == -1) {
+    std::cerr << "Invalid newline character to delete" << std::endl;
+  }
+
+  std::string stringToMove = m_Lines[nextLineYOffset];
+  m_Lines.erase(m_Lines.begin() + nextLineYOffset);
+  m_Lines[yOffset].append(stringToMove);
+}
+
+void TextBuffer::RemoveCharAtOffset(int yOffset, int xOffset) {
+  int currentMaxXOffset = m_Lines[yOffset].size() - 1;
+  int maxYOffset = m_Lines.size();
+
+  // Bounds checking
+  if (xOffset > currentMaxXOffset || yOffset > maxYOffset) {
+    std::cerr << "Invalid position to delete from" << std::endl;
+    exit(-1);
+  }
+
+  EraseChar(yOffset, xOffset);
+}
+
+// Just a wrapper around the string::erase fucntion
+// Ensure the the offsets are within bounds before calling this function
+// As this function won't do bounds checking
+void TextBuffer::EraseChar(int yOffset, int xOffset) {
+  m_Lines[yOffset].erase(m_Lines[yOffset].begin() + xOffset);
 }
 
 std::pair<Position, Position> TextBuffer::DetermineEnds() {

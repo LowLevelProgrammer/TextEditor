@@ -54,6 +54,9 @@ public:
   void InsertBuffer(Register reg);
   // Can Undo
   void DeleteSelection();
+  void RemoveNewlineCharAtOffset(int yOffset);
+  void RemoveCharAtOffset(int yOffset, int xOffset);
+  void EraseChar(int yOffset, int xOffset);
   bool IsEOF();
   const Position GetEOFPosition() const;
   void Clear();
