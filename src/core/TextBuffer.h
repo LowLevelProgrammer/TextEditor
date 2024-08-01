@@ -36,9 +36,12 @@ public:
   ~TextBuffer();
 
   // Can Undo
-  void InsertChar(char character);
-  // Can Undo
-  void InsertLine(std::string text);
+  void AddCharAtCaret(char character);
+  void AddCharAtOffset(char character, int yOffset, int xOffset);
+  void AddNewlineCharAtOffset(int yOffset, int xOffset);
+  void AddPrintableCharAtOffset(char character, int yOffset, int xOffset);
+  void InsertChar(char character, int yOffset, int xOffset);
+  void InsertLine(std::string line);
   // Can Undo
   Position MoveCaret(Direction direction);
   void RemoveCharAtCaret();

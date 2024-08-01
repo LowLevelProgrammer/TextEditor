@@ -15,15 +15,15 @@ inline void PrintLines(const std::vector<std::string> &vec) {
 
 inline void InsertLine(TextBuffer &tb, const std::string &line) {
   for (const auto &ch : line) {
-    tb.InsertChar(ch);
+    tb.AddCharAtCaret(ch);
   }
-  tb.InsertChar('\n');
+  tb.AddCharAtCaret('\n');
 }
 
 inline void InsertLineWithoutNewlineCharacter(TextBuffer &tb,
                                               const std::string &line) {
   for (const auto &ch : line) {
-    tb.InsertChar(ch);
+    tb.AddCharAtCaret(ch);
   }
 }
 

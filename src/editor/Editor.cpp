@@ -12,9 +12,7 @@ Editor::Editor() : m_TextBuffer(), m_FileHandler() {
 
 Editor::~Editor() { delete[] (m_Register); }
 
-void Editor::InsertChar(char character) { m_TextBuffer.InsertChar(character); }
-
-void Editor::InsertLine(std::string line) { m_TextBuffer.InsertLine(line); }
+void Editor::InsertChar(char character) { m_TextBuffer.AddCharAtCaret(character); }
 
 void Editor::BackSpace() { m_TextBuffer.RemoveCharAtCaret(); }
 void Editor::Select(Position startPosition, Position endPosition) {
