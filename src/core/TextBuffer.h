@@ -42,9 +42,7 @@ public:
   void AddPrintableCharAtOffset(char character, int yOffset, int xOffset);
   void InsertChar(char character, int yOffset, int xOffset);
   void InsertLine(std::string line);
-  // Can Undo
   Position MoveCaret(Direction direction);
-  void RemoveCharAtCaret();
   void Undo();
   void Redo();
   void PrintBuffer();
@@ -57,8 +55,11 @@ public:
   void InsertBuffer(Register reg);
   // Can Undo
   void DeleteSelection();
-  void RemoveNewlineCharAtOffset(int yOffset);
+
+  void RemoveCharAtCaret();
   void RemoveCharAtOffset(int yOffset, int xOffset);
+  void RemovePrintableCharAtOffset(int yOffset, int xOffset);
+  void RemoveNewlineCharAtOffset(int yOffset);
   void EraseChar(int yOffset, int xOffset);
   bool IsStartOfLine(int yOffset, int xOffset);
   bool IsSOF(int yOffset, int xOffset);

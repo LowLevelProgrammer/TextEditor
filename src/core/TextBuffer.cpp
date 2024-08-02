@@ -202,36 +202,6 @@ Position TextBuffer::MoveCaret(Direction direction) {
   return updatedCarentPosition;
 }
 
-void TextBuffer::RemoveCharAtCaret() {
-  int xOffset = m_CaretPosition.Column - 2;
-  int yOffset = m_CaretPosition.Line - 1;
-
-  if (IsSOF(yOffset, xOffset)) {
-    return;
-  }
-
-  if (m_IsSelected) {
-    // Handles setting of caret
-    DeleteSelection();
-    return;
-  }
-
-  if (IsStartOfLine(yOffset, xOffset)) {
-    // Since the "virtual" newline char is technically present at the end of
-    // previous line
-    int newlineCharYOffset = yOffset - 1;
-    // No need to subtract 1 since the "virtual" newline char is present AFTER
-    // the entire previous line
-    int newlineCharXOffset = m_Lines[newlineCharYOffset].size();
-
-    RemoveNewlineCharAtOffset(newlineCharYOffset);
-    SetCaretPosition({newlineCharYOffset + 1, newlineCharXOffset + 1});
-  } else {
-    RemoveCharAtOffset(yOffset, xOffset);
-    SetCaretPosition({m_CaretPosition.Line, --m_CaretPosition.Column});
-  }
-}
-
 void TextBuffer::Undo() {
   if (!m_UndoStack.empty()) {
     Transaction trnxn = m_UndoStack.back();
@@ -247,7 +217,7 @@ void TextBuffer::Undo() {
       int xOffset = op.XOffset;
       switch (op.Type) {
       case OperationType::InsertChar:
-        RemoveCharAtOffset(yOffset, xOffset);
+        RemovePrintableCharAtOffset(yOffset, xOffset);
         SetCaretPosition({yOffset + 1, xOffset + 1});
         break;
       case OperationType::RemoveChar:
@@ -373,6 +343,41 @@ void TextBuffer::DeleteSelection() {
   m_CaretPosition = start;
 }
 
+void TextBuffer::RemoveCharAtCaret() {
+  int xOffset = m_CaretPosition.Column - 2;
+  int yOffset = m_CaretPosition.Line - 1;
+
+  RemoveCharAtOffset(yOffset, xOffset);
+}
+
+void TextBuffer::RemoveCharAtOffset(int yOffset, int xOffset) {
+
+  if (IsSOF(yOffset, xOffset)) {
+    return;
+  }
+
+  if (m_IsSelected) {
+    // Handles setting of caret
+    DeleteSelection();
+    return;
+  }
+
+  if (IsStartOfLine(yOffset, xOffset)) {
+    // Since the "virtual" newline char is technically present at the end of
+    // previous line
+    int newlineCharYOffset = yOffset - 1;
+    // No need to subtract 1 since the "virtual" newline char is present AFTER
+    // the entire previous line
+    int newlineCharXOffset = m_Lines[newlineCharYOffset].size();
+
+    RemoveNewlineCharAtOffset(newlineCharYOffset);
+    SetCaretPosition({newlineCharYOffset + 1, newlineCharXOffset + 1});
+  } else {
+    RemovePrintableCharAtOffset(yOffset, xOffset);
+    SetCaretPosition({m_CaretPosition.Line, --m_CaretPosition.Column});
+  }
+}
+
 void TextBuffer::RemoveNewlineCharAtOffset(int yOffset) {
   // In this case have to move the (yOffset + 1)th line to yOffset
   int nextLineYOffset = yOffset + 1;
@@ -390,7 +395,7 @@ void TextBuffer::RemoveNewlineCharAtOffset(int yOffset) {
   m_Lines[yOffset].append(stringToMove);
 }
 
-void TextBuffer::RemoveCharAtOffset(int yOffset, int xOffset) {
+void TextBuffer::RemovePrintableCharAtOffset(int yOffset, int xOffset) {
   int currentLineMaxXOffset = m_Lines[yOffset].size() - 1;
   int maxYOffset = m_Lines.size() - 1;
 
