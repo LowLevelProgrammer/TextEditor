@@ -203,44 +203,32 @@ Position TextBuffer::MoveCaret(Direction direction) {
 }
 
 void TextBuffer::RemoveCharAtCaret() {
-  int xPos = m_CaretPosition.Column - 2;
-  int yPos = m_CaretPosition.Line - 1;
+  int xOffset = m_CaretPosition.Column - 2;
+  int yOffset = m_CaretPosition.Line - 1;
 
-  // First check if selection is active
-  if (m_IsSelected) {
-    // Handles caret position update
-    DeleteSelection();
-  }
-  // Else check if the caret is at the very beginning of the document
-  else if (xPos == -1 && yPos == 0) {
+  if (IsSOF(yOffset, xOffset)) {
     return;
   }
-  // Else check if caret is at the very beginning of a line
-  else if (xPos == -1) {
-    int prevLineYOffset = yPos - 1;
-    int prevLineXOffset = m_Lines[prevLineYOffset].size() - 1;
 
-    // Need to simply move to the previous line if there's nothing after the
-    // caret
-    // Or need to move every line to the previous line if there is
-    std::string currentLine = m_Lines[yPos];
+  if (m_IsSelected) {
+    // Handles setting of caret
+    DeleteSelection();
+    return;
+  }
 
-    // Copy current line to the previous line
-    m_Lines[prevLineYOffset].append(currentLine);
-    // Remove current line
-    m_Lines.erase(m_Lines.begin() + yPos);
+  if (IsStartOfLine(yOffset, xOffset)) {
+    // Since the "virtual" newline char is technically present at the end of
+    // previous line
+    int newlineCharYOffset = yOffset - 1;
+    // No need to subtract 1 since the "virtual" newline char is present AFTER
+    // the entire previous line
+    int newlineCharXOffset = m_Lines[newlineCharYOffset].size();
 
-    //
-    // Update caret position
-    //
-
-    // Add 2 to the x-offset because caret should be on the right side of the
-    // char
-    SetCaretPosition({prevLineYOffset + 1, prevLineXOffset + 2});
+    RemoveNewlineCharAtOffset(newlineCharYOffset);
+    SetCaretPosition({newlineCharYOffset + 1, newlineCharXOffset + 1});
   } else {
-    m_Lines[yPos].erase(m_Lines[yPos].begin() + xPos);
-    // Update caret position
-    m_CaretPosition.Column--;
+    RemoveCharAtOffset(yOffset, xOffset);
+    SetCaretPosition({m_CaretPosition.Line, --m_CaretPosition.Column});
   }
 }
 
@@ -481,6 +469,20 @@ void TextBuffer::InsertBuffer(Register reg) {
   }
 
   m_Lines[line].insert(0, buffer[buffer.size() - 1]);
+}
+
+bool TextBuffer::IsStartOfLine(int yOffset, int xOffset) {
+  int maxYOffset = m_Lines.size();
+
+  if (yOffset > maxYOffset) {
+    std::cerr << "StartOfLine fn error: Invalid Y offset" << std::endl;
+    exit(-1);
+  }
+  return xOffset == -1;
+}
+
+bool TextBuffer::IsSOF(int yOffset, int xOffset) {
+  return (yOffset == 0 && xOffset == -1);
 }
 
 bool TextBuffer::IsEOF() {

@@ -16,7 +16,6 @@ public:
   void BackSpace();
   void Select(Position startPosition, Position endPosition);
   void Undo();
-  // TODO: Complete redo feature
   void Redo();
   void SetCaretPosition(Position position);
   void Copy(int registerNumber);
