@@ -85,6 +85,7 @@ private:
   Transaction m_CurrentTransaction;
   bool m_InTransaction = false;
   std::vector<Transaction> m_UndoStack;
+  std::vector<Transaction> m_RedoStack;
   char m_LastCharacter = '\0';
 
 private:

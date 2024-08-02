@@ -247,6 +247,7 @@ void TextBuffer::RemoveCharAtCaret() {
 void TextBuffer::Undo() {
   if (!m_UndoStack.empty()) {
     Transaction trnxn = m_UndoStack.back();
+    m_RedoStack.push_back(trnxn);
     m_UndoStack.pop_back();
     StopTransaction();
     m_LastCharacter = '\0';
@@ -272,7 +273,33 @@ void TextBuffer::Undo() {
   }
 }
 
-void TextBuffer::Redo() {}
+void TextBuffer::Redo() {
+  if (!m_RedoStack.empty()) {
+    Transaction trnxn = m_RedoStack.back();
+    m_RedoStack.pop_back();
+    StopTransaction();
+    m_LastCharacter = '\0';
+
+    for (auto it = trnxn.Operations.begin(); it != trnxn.Operations.end();
+         it++) {
+      Operation op = *it;
+      int yOffset = op.YOffset;
+      int xOffset = op.XOffset;
+      switch (op.Type) {
+      case OperationType::InsertChar:
+        AddCharAtOffset(op.Character, yOffset, xOffset);
+        SetCaretPosition({yOffset + 1, xOffset + 2});
+        break;
+      case OperationType::RemoveChar:
+        break;
+      case OperationType::InsertNewLine:
+        AddNewlineCharAtOffset(yOffset, xOffset);
+        SetCaretPosition({yOffset + 2, xOffset + 2});
+        break;
+      }
+    }
+  }
+}
 
 void TextBuffer::PrintBuffer() {
   for (auto line : m_Lines) {
