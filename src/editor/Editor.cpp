@@ -12,14 +12,14 @@ Editor::Editor() : m_TextBuffer(), m_FileHandler() {
 
 Editor::~Editor() { delete[] (m_Register); }
 
-void Editor::InsertChar(char character) { m_TextBuffer.AddCharAtCaret(character); }
+void Editor::InsertChar(char character) {}
 
-void Editor::BackSpace() { m_TextBuffer.RemoveCharAtCaret(); }
+void Editor::BackSpace() {}
 void Editor::Select(Position startPosition, Position endPosition) {
   m_TextBuffer.Select(startPosition, endPosition);
 }
-void Editor::Undo() { m_TextBuffer.Undo(); }
-void Editor::Redo() { m_TextBuffer.Redo(); }
+void Editor::Undo() {}
+void Editor::Redo() {}
 void Editor::SetCaretPosition(Position position) {
   m_TextBuffer.SetCaretPosition(position);
 }

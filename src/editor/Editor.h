@@ -36,10 +36,6 @@ public:
     return m_TextBuffer.GetLines();
   }
 
-  inline const std::vector<Transaction> &GetUndoStack() const {
-    return m_TextBuffer.GetUndoStack();
-  }
-
 private:
   void HandleInput();
 

@@ -12,7 +12,7 @@ find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 
 # Include directories
-include_directories(src/core src/io src/editor src/tui src/application src/)
+include_directories(src/core/commands src/core src/io src/editor src/tui src/application src/)
 
 # Glob all source and header files recursively
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")

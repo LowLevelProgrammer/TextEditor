@@ -15,114 +15,30 @@ TextBuffer::TextBuffer()
 }
 TextBuffer::~TextBuffer() {}
 
-void TextBuffer::AddCharAtCaret(char character) {
-  int yOffset = m_CaretPosition.Line - 1;
-  int xOffset = m_CaretPosition.Column - 1;
-
-  AddCharAtOffset(character, yOffset, xOffset);
+// Wrapper for std::insert function
+// No bounds checking
+void TextBuffer::InsertChar(char character, Offset offset) {
+  m_Lines[offset.Y].insert(m_Lines[offset.Y].begin() + offset.X, character);
 }
 
-void TextBuffer::AddCharAtOffset(char character, int yOffset, int xOffset) {
+void TextBuffer::InsertNewline(Offset offset) {
+  std::string stringToMove = m_Lines[offset.Y].substr(offset.X);
+  m_Lines[offset.Y].erase(offset.X);
 
-  Operation op;
-  op.YOffset = yOffset;
-  op.XOffset = xOffset;
-  op.Character = character;
-
-  // If first of 'space' or 'newline' char of consecutive sequence of such
-  // chars
-  // then end the current transaction and start a new one
-  if (!m_InTransaction || (character == ' ' && m_LastCharacter != ' ') ||
-      (character == '\n' && m_LastCharacter != '\n')) {
-    // If already in transaction then it has entered the condition because
-    // its
-    // either a first "space" or a "newline" char
-    // In which case have to stop the current transaction
-    if (m_InTransaction) {
-      StopTransaction();
-    }
-    StartTransaction();
-  }
-
-  switch (character) {
-  case '\n': {
-    // String to move to the new line
-    // |
-    // L__ Empty string incase caret is at EOL
-    // L__ Else rest of the string is moved to the new line
-    // std::string stringToMove = m_Lines[yOffset].substr(xOffset);
-    // m_Lines.insert(m_Lines.begin() + yOffset + 1, stringToMove);
-    //
-    // // Remove the string from the current line
-    // m_Lines[yOffset].erase(xOffset);
-    //
-
-    AddNewlineCharAtOffset(yOffset, xOffset);
-    m_CaretPosition.Line++;
-    m_CaretPosition.Column = 1;
-
-    // Record the Operation
-    op.Type = OperationType::InsertNewLine;
-  } break;
-  case ' ':
-    // m_Lines[yOffset].insert(m_Lines[yOffset].begin() + xOffset, ' ');
-    AddPrintableCharAtOffset(' ', yOffset, xOffset);
-    m_CaretPosition.Column++;
-
-    op.Type = OperationType::InsertChar;
-    break;
-  default:
-    // m_Lines[yOffset].insert(m_Lines[yOffset].begin() + xOffset, character);
-    AddPrintableCharAtOffset(character, yOffset, xOffset);
-    m_CaretPosition.Column++;
-    op.Type = OperationType::InsertChar;
-    break;
-  }
-
-  AddOperation(op);
-
-  CommitTransaction();
-
-  // Update last character
-  m_LastCharacter = character;
-}
-
-void TextBuffer::AddNewlineCharAtOffset(int yOffset, int xOffset) {
-
-  int currentLineSize = m_Lines[yOffset].size();
-  int maxYOffset = m_Lines.size() - 1;
-
-  if (xOffset > currentLineSize || xOffset < 0 || yOffset > maxYOffset ||
-      yOffset < 0) {
-    std::cerr << "Invalid offset to insert newline character" << std::endl;
-    exit(-1);
-  }
-
-  std::string stringToMove = m_Lines[yOffset].substr(xOffset);
-  m_Lines[yOffset].erase(xOffset);
-  int nextLineYOffset = yOffset + 1;
+  int nextLineYOffset = offset.Y + 1;
   m_Lines.insert(m_Lines.begin() + nextLineYOffset, stringToMove);
 }
 
-void TextBuffer::AddPrintableCharAtOffset(char character, int yOffset,
-                                          int xOffset) {
-  int currentLineSize = m_Lines[yOffset].size();
-  int maxYOffset = m_Lines.size() - 1;
-
-  // Bounds checking
-  if (xOffset > currentLineSize || xOffset < 0 || yOffset > maxYOffset ||
-      yOffset < 0) {
-    std::cerr << "Invalid offset to insert printable character" << std::endl;
-    exit(-1);
-  }
-
-  InsertChar(character, yOffset, xOffset);
+// Just a wrapper around the string::erase function
+// Ensure the the offsets are within bounds before calling this function
+// As this function won't do bounds checking
+void TextBuffer::EraseChar(Offset offset) {
+  m_Lines[offset.Y].erase(m_Lines[offset.Y].begin() + offset.X);
 }
 
-// Wrapper for std::insert function
-// No bounds checking
-void TextBuffer::InsertChar(char character, int yOffset, int xOffset) {
-  m_Lines[yOffset].insert(m_Lines[yOffset].begin() + xOffset, character);
+void TextBuffer::EraseNewline(Offset offset) {
+  m_Lines[offset.Y] += m_Lines[offset.Y + 1];
+  m_Lines.erase(m_Lines.begin() + offset.Y + 1);
 }
 
 void TextBuffer::InsertLine(std::string line) {}
@@ -200,63 +116,6 @@ Position TextBuffer::MoveCaret(Direction direction) {
   updatedCarentPosition = {m_CaretPosition.Line, m_CaretPosition.Column};
 
   return updatedCarentPosition;
-}
-
-void TextBuffer::Undo() {
-  if (!m_UndoStack.empty()) {
-    Transaction trnxn = m_UndoStack.back();
-    m_RedoStack.push_back(trnxn);
-    m_UndoStack.pop_back();
-    StopTransaction();
-    m_LastCharacter = '\0';
-
-    for (auto it = trnxn.Operations.rbegin(); it != trnxn.Operations.rend();
-         it++) {
-      Operation op = *it;
-      int yOffset = op.YOffset;
-      int xOffset = op.XOffset;
-      switch (op.Type) {
-      case OperationType::InsertChar:
-        RemovePrintableCharAtOffset(yOffset, xOffset);
-        SetCaretPosition({yOffset + 1, xOffset + 1});
-        break;
-      case OperationType::RemoveChar:
-        break;
-      case OperationType::InsertNewLine:
-        RemoveNewlineCharAtOffset(yOffset);
-        SetCaretPosition({yOffset + 1, xOffset + 1});
-        break;
-      }
-    }
-  }
-}
-
-void TextBuffer::Redo() {
-  if (!m_RedoStack.empty()) {
-    Transaction trnxn = m_RedoStack.back();
-    m_RedoStack.pop_back();
-    StopTransaction();
-    m_LastCharacter = '\0';
-
-    for (auto it = trnxn.Operations.begin(); it != trnxn.Operations.end();
-         it++) {
-      Operation op = *it;
-      int yOffset = op.YOffset;
-      int xOffset = op.XOffset;
-      switch (op.Type) {
-      case OperationType::InsertChar:
-        AddCharAtOffset(op.Character, yOffset, xOffset);
-        SetCaretPosition({yOffset + 1, xOffset + 2});
-        break;
-      case OperationType::RemoveChar:
-        break;
-      case OperationType::InsertNewLine:
-        AddNewlineCharAtOffset(yOffset, xOffset);
-        SetCaretPosition({yOffset + 2, xOffset + 2});
-        break;
-      }
-    }
-  }
 }
 
 void TextBuffer::PrintBuffer() {
@@ -343,77 +202,8 @@ void TextBuffer::DeleteSelection() {
   m_CaretPosition = start;
 }
 
-void TextBuffer::RemoveCharAtCaret() {
-  int xOffset = m_CaretPosition.Column - 2;
-  int yOffset = m_CaretPosition.Line - 1;
-
-  RemoveCharAtOffset(yOffset, xOffset);
-}
-
-void TextBuffer::RemoveCharAtOffset(int yOffset, int xOffset) {
-
-  if (IsSOF(yOffset, xOffset)) {
-    return;
-  }
-
-  if (m_IsSelected) {
-    // Handles setting of caret
-    DeleteSelection();
-    return;
-  }
-
-  if (IsStartOfLine(yOffset, xOffset)) {
-    // Since the "virtual" newline char is technically present at the end of
-    // previous line
-    int newlineCharYOffset = yOffset - 1;
-    // No need to subtract 1 since the "virtual" newline char is present AFTER
-    // the entire previous line
-    int newlineCharXOffset = m_Lines[newlineCharYOffset].size();
-
-    RemoveNewlineCharAtOffset(newlineCharYOffset);
-    SetCaretPosition({newlineCharYOffset + 1, newlineCharXOffset + 1});
-  } else {
-    RemovePrintableCharAtOffset(yOffset, xOffset);
-    SetCaretPosition({m_CaretPosition.Line, --m_CaretPosition.Column});
-  }
-}
-
-void TextBuffer::RemoveNewlineCharAtOffset(int yOffset) {
-  // In this case have to move the (yOffset + 1)th line to yOffset
-  int nextLineYOffset = yOffset + 1;
-  int maxYOffset = m_Lines.size() - 1;
-
-  // Bounds checking
-  // To consider: Can change to yOffset > maxYOffset - 1 as if maxYOffset has
-  // newline char then it is not the last line offset
-  if (yOffset < 0 || yOffset > maxYOffset) {
-    std::cerr << "Invalid offset to delete newline character from" << std::endl;
-  }
-
-  std::string stringToMove = m_Lines[nextLineYOffset];
-  m_Lines.erase(m_Lines.begin() + nextLineYOffset);
-  m_Lines[yOffset].append(stringToMove);
-}
-
-void TextBuffer::RemovePrintableCharAtOffset(int yOffset, int xOffset) {
-  int currentLineMaxXOffset = m_Lines[yOffset].size() - 1;
-  int maxYOffset = m_Lines.size() - 1;
-
-  // Bounds checking
-  if (xOffset > currentLineMaxXOffset || xOffset < 0 || yOffset > maxYOffset ||
-      yOffset < 0) {
-    std::cerr << "Invalid offset to delete character from" << std::endl;
-    exit(-1);
-  }
-
-  EraseChar(yOffset, xOffset);
-}
-
-// Just a wrapper around the string::erase fucntion
-// Ensure the the offsets are within bounds before calling this function
-// As this function won't do bounds checking
-void TextBuffer::EraseChar(int yOffset, int xOffset) {
-  m_Lines[yOffset].erase(m_Lines[yOffset].begin() + xOffset);
+char TextBuffer::GetCharAtOffset(Offset offset) {
+  return m_Lines[offset.Y][offset.X];
 }
 
 std::pair<Position, Position> TextBuffer::DetermineEnds() {
@@ -504,31 +294,3 @@ const Position TextBuffer::GetEOFPosition() const {
 }
 
 void TextBuffer::Clear() { m_Lines.clear(); }
-
-void TextBuffer::StartTransaction() {
-  m_InTransaction = true;
-  m_UndoStack.push_back({});
-}
-
-void TextBuffer::StopTransaction() {
-  if (m_InTransaction && !m_CurrentTransaction.Empty()) {
-    m_InTransaction = false;
-    m_CurrentTransaction.Clear();
-  } else {
-    std::cerr << "Error: Invalid time to stop transaction" << std::endl;
-  }
-}
-
-void TextBuffer::CommitTransaction() {
-  if (m_UndoStack.empty()) {
-    std::cerr << "Error in undo system: Commit when undo stack is empty"
-              << std::endl;
-    exit(-1);
-  }
-  Transaction &mostRecentTransaction = m_UndoStack.back();
-  mostRecentTransaction = m_CurrentTransaction;
-}
-
-void TextBuffer::AddOperation(const Operation &operation) {
-  m_CurrentTransaction.Operations.push_back(operation);
-}

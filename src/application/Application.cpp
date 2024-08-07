@@ -23,8 +23,6 @@ void Application::Clear() {
 
 void Application::Draw() {
   m_MainWindow.Draw();
-  std::string undoStackString = GetUndoStackString(m_Editor.GetUndoStack());
-  m_SecondaryWindow->Draw(undoStackString);
 }
 
 void Application::Refresh() {

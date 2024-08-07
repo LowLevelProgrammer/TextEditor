@@ -14,17 +14,17 @@ inline void PrintLines(const std::vector<std::string> &vec) {
 }
 
 inline void InsertLine(TextBuffer &tb, const std::string &line) {
-  for (const auto &ch : line) {
-    tb.AddCharAtCaret(ch);
-  }
-  tb.AddCharAtCaret('\n');
+  // for (const auto &ch : line) {
+  //   tb.AddCharAtCaret(ch);
+  // }
+  // tb.AddCharAtCaret('\n');
 }
 
 inline void InsertLineWithoutNewlineCharacter(TextBuffer &tb,
                                               const std::string &line) {
-  for (const auto &ch : line) {
-    tb.AddCharAtCaret(ch);
-  }
+  // for (const auto &ch : line) {
+  //   tb.AddCharAtCaret(ch);
+  // }
 }
 
 inline std::string GetPrintableString(char character) {
@@ -47,48 +47,48 @@ inline std::string GetOperationTypeString(OperationType type) {
   exit(-1);
 }
 
-inline std::string GetTransactionString(Transaction transaction) {
-  int numOperations = transaction.Operations.size();
-  std::stringstream ss;
-  ss << "Transaction Size: " << numOperations << std::endl;
-
-  for (Operation operation : transaction.Operations) {
-    ss << "{ " << GetOperationTypeString(operation.Type) << ", '"
-       << GetPrintableString(operation.Character) << "', " << operation.YOffset
-       << ", " << operation.XOffset << " }";
-  }
-  ss << std::endl;
-  return ss.str();
-}
-
-inline void PrintTransaction(Transaction transaction) {
-  int numOperations = transaction.Operations.size();
-  std::cout << "Transaction Size: " << numOperations << std::endl;
-
-  for (Operation operation : transaction.Operations) {
-    std::cout << "{ " << GetOperationTypeString(operation.Type) << ", '"
-              << GetPrintableString(operation.Character) << "', "
-              << operation.YOffset << ", " << operation.XOffset << " }";
-  }
-  std::cout << std::endl;
-}
-
-inline std::string
-GetUndoStackString(const std::vector<Transaction> &undoStack) {
-  std::stringstream ss;
-  ss << "Undo Stack:-" << std::endl;
-  for (Transaction trnxn : undoStack) {
-    ss << GetTransactionString(trnxn);
-  }
-  return ss.str();
-}
-
-inline void PrintUndoStack(const std::vector<Transaction> &undoStack) {
-  std::cout << "Undo Stack:-" << std::endl;
-  for (Transaction trnxn : undoStack) {
-    PrintTransaction(trnxn);
-  }
-}
+// inline std::string GetTransactionString(Transaction transaction) {
+//   int numOperations = transaction.Operations.size();
+//   std::stringstream ss;
+//   ss << "Transaction Size: " << numOperations << std::endl;
+//
+//   for (Operation operation : transaction.Operations) {
+//     ss << "{ " << GetOperationTypeString(operation.Type) << ", '"
+//        << GetPrintableString(operation.Character) << "', " << operation.YOffset
+//        << ", " << operation.XOffset << " }";
+//   }
+//   ss << std::endl;
+//   return ss.str();
+// }
+//
+// inline void PrintTransaction(Transaction transaction) {
+//   int numOperations = transaction.Operations.size();
+//   std::cout << "Transaction Size: " << numOperations << std::endl;
+//
+//   for (Operation operation : transaction.Operations) {
+//     std::cout << "{ " << GetOperationTypeString(operation.Type) << ", '"
+//               << GetPrintableString(operation.Character) << "', "
+//               << operation.YOffset << ", " << operation.XOffset << " }";
+//   }
+//   std::cout << std::endl;
+// }
+//
+// inline std::string
+// GetUndoStackString(const std::vector<Transaction> &undoStack) {
+//   std::stringstream ss;
+//   ss << "Undo Stack:-" << std::endl;
+//   for (Transaction trnxn : undoStack) {
+//     ss << GetTransactionString(trnxn);
+//   }
+//   return ss.str();
+// }
+//
+// inline void PrintUndoStack(const std::vector<Transaction> &undoStack) {
+//   std::cout << "Undo Stack:-" << std::endl;
+//   for (Transaction trnxn : undoStack) {
+//     PrintTransaction(trnxn);
+//   }
+// }
 
 inline void PrintCaretPosition(const Position &position) {
   std::cout << "Caret Position: { " << position.Line << ", " << position.Column
