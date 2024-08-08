@@ -4,7 +4,7 @@
 #include "Transaction.h"
 class EraseChar : public Transaction {
 public:
-  EraseChar(TextBuffer& textBuffer, Offset offset);
+  EraseChar(TextBuffer &textBuffer, Offset offset);
 
   std::string TransactionDetails();
   void Execute() override;
@@ -12,8 +12,7 @@ public:
   void Redo() override;
 
 protected:
-  TextBuffer& m_TextBuffer;
+  TextBuffer &m_TextBuffer;
   char m_RemovedChar;
   Offset m_Offset;
 };
-

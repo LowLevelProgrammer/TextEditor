@@ -13,6 +13,6 @@ public:
   void Redo();
 
 private:
-  std::vector<Transaction*> m_UndoStack;
-  std::vector<Transaction*> m_RedoStack;
+  std::vector<Transaction *> m_UndoStack;
+  std::vector<Transaction *> m_RedoStack;
 };

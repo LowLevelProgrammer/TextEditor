@@ -19,3 +19,7 @@ file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
 
 add_executable(TextEditor ${SOURCE_FILES})
 target_link_libraries(TextEditor ${CURSES_LIBRARIES} tinfo)
+
+# Add test directory
+enable_testing()
+add_subdirectory(tests)

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "TextBuffer.h"
 #include "Transaction.h"
 #include <string>

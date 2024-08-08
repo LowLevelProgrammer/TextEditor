@@ -2,7 +2,6 @@
 
 #include "TextBuffer.h"
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -54,7 +53,8 @@ inline std::string GetOperationTypeString(OperationType type) {
 //
 //   for (Operation operation : transaction.Operations) {
 //     ss << "{ " << GetOperationTypeString(operation.Type) << ", '"
-//        << GetPrintableString(operation.Character) << "', " << operation.YOffset
+//        << GetPrintableString(operation.Character) << "', " <<
+//        operation.YOffset
 //        << ", " << operation.XOffset << " }";
 //   }
 //   ss << std::endl;

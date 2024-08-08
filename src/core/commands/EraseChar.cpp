@@ -8,8 +8,8 @@ EraseChar::EraseChar(TextBuffer &textBuffer, Offset offset)
 
 std::string EraseChar::TransactionDetails() {
   std::stringstream ss;
-  ss << "Remove char '" << m_RemovedChar << "' at offset { "
-            << m_Offset.Y << ", " << m_Offset.X << " }" << std::endl;
+  ss << "Remove char '" << m_RemovedChar << "' at offset { " << m_Offset.Y
+     << ", " << m_Offset.X << " }" << std::endl;
   return ss.str();
 }
 

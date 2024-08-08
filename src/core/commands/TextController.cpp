@@ -14,17 +14,17 @@ void TextController::Undo() {
   if (m_UndoStack.empty())
     return;
 
-  Transaction* lastTransaction = m_UndoStack.back();
+  Transaction *lastTransaction = m_UndoStack.back();
   m_UndoStack.pop_back();
   lastTransaction->Undo();
   m_RedoStack.push_back(lastTransaction);
 }
 
 void TextController::Redo() {
-  if(m_RedoStack.empty())
+  if (m_RedoStack.empty())
     return;
 
-  Transaction* lastTransaction = m_RedoStack.back();
+  Transaction *lastTransaction = m_RedoStack.back();
   m_RedoStack.pop_back();
   lastTransaction->Redo();
   m_UndoStack.push_back(lastTransaction);
