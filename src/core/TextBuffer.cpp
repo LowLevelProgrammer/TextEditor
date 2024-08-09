@@ -1,4 +1,5 @@
 #include "TextBuffer.h"
+#include "custom_assert.h"
 
 #include <algorithm>
 #include <assert.h>
@@ -202,10 +203,6 @@ void TextBuffer::DeleteSelection() {
   m_CaretPosition = start;
 }
 
-char TextBuffer::GetCharAtOffset(Offset offset) {
-  return m_Lines[offset.Y][offset.X];
-}
-
 std::pair<Position, Position> TextBuffer::DetermineEnds() {
   Position start, end;
   if (m_CaretPosition.Line > m_SelectionStartPosition.Line) {
@@ -294,3 +291,14 @@ const Position TextBuffer::GetEOFPosition() const {
 }
 
 void TextBuffer::Clear() { m_Lines.clear(); }
+
+const std::string &TextBuffer::GetLineAtOffset(int lineOffset) {
+  ASSERT_OR_RETURN(lineOffset >= 0 && lineOffset < m_Lines.size());
+  return m_Lines[lineOffset];
+}
+
+char TextBuffer::GetCharAtOffset(Offset offset) {
+  // ASSERT_OR_RETURN(offset.Y >= 0 && offset.Y < m_Lines.size() &&
+  //                  offset.X >= 0 && offset.X < m_Lines[offset.Y].size())
+  return m_Lines[offset.Y][offset.X];
+}

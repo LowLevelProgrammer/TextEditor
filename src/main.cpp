@@ -1,4 +1,3 @@
-#include "EraseChar.h"
 #include "InsertChar.h"
 #include "InsertNewline.h"
 #include "TextBuffer.h"
@@ -29,19 +28,21 @@ int main() {
   textController.Execute(new InsertChar(tb, 'g', {1, 5}));
   textController.Execute(new InsertNewline(tb, {1, 6}));
   textController.Execute(new InsertChar(tb, 'I', {2, 0}));
-  textController.Execute(new EraseChar(tb, {2, 0}));
 
-  tb.PrintBuffer();
+  std::cout << "Printing: \n";
+  std::cout << tb.GetLineAtOffset(3);
 
-  std::cout << "After undo:" << std::endl;
-  for (int i = 0; i < 18; i++) {
-    textController.Undo();
-    tb.PrintBuffer();
-  }
-
-  std::cout << "After Redo:" << std::endl;
-  for (int i = 0; i < 5; i++) {
-    textController.Redo();
-    tb.PrintBuffer();
-  }
+  // tb.PrintBuffer();
+  //
+  // std::cout << "After undo:" << std::endl;
+  // for (int i = 0; i < 18; i++) {
+  //   textController.Undo();
+  //   tb.PrintBuffer();
+  // }
+  //
+  // std::cout << "After Redo:" << std::endl;
+  // for (int i = 0; i < 5; i++) {
+  //   textController.Redo();
+  //   tb.PrintBuffer();
+  // }
 }

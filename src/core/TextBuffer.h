@@ -41,13 +41,15 @@ public:
   bool SelectionActive();
   void InsertBuffer(Register reg);
   void DeleteSelection();
-  char GetCharAtOffset(Offset offset);
 
   bool IsStartOfLine(int yOffset, int xOffset);
   bool IsSOF(int yOffset, int xOffset);
   bool IsEOF();
-  const Position GetEOFPosition() const;
   void Clear();
+  const Position GetEOFPosition() const;
+
+  const std::string &GetLineAtOffset(int lineOffset);
+  char GetCharAtOffset(Offset offset);
 
   inline const std::vector<std::string> &GetLines() const { return m_Lines; }
   inline const Position &GetCaretPosition() const { return m_CaretPosition; }
@@ -61,8 +63,6 @@ private:
   // TODO: Check file bounds before any caret position setting operation
   // everywhere
   Position m_FileEnd;
-  bool m_InTransaction = false;
-  char m_LastCharacter = '\0';
 
 private:
   std::pair<Position, Position> DetermineEnds();
