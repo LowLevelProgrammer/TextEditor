@@ -17,12 +17,13 @@ TextBuffer::TextBuffer()
 TextBuffer::~TextBuffer() {}
 
 // Wrapper for std::insert function
-// No bounds checking
 void TextBuffer::InsertChar(char character, Offset offset) {
+  ASSERT_INSERT_BOUNDS(offset, m_Lines);
   m_Lines[offset.Y].insert(m_Lines[offset.Y].begin() + offset.X, character);
 }
 
 void TextBuffer::InsertNewline(Offset offset) {
+  ASSERT_INSERT_BOUNDS(offset, m_Lines);
   std::string stringToMove = m_Lines[offset.Y].substr(offset.X);
   m_Lines[offset.Y].erase(offset.X);
 
@@ -30,14 +31,14 @@ void TextBuffer::InsertNewline(Offset offset) {
   m_Lines.insert(m_Lines.begin() + nextLineYOffset, stringToMove);
 }
 
-// Just a wrapper around the string::erase function
-// Ensure the the offsets are within bounds before calling this function
-// As this function won't do bounds checking
+// Wrapper around the string::erase function
 void TextBuffer::EraseChar(Offset offset) {
+  ASSERT_WITHIIN_BOUNDS(offset, m_Lines);
   m_Lines[offset.Y].erase(m_Lines[offset.Y].begin() + offset.X);
 }
 
 void TextBuffer::EraseNewline(Offset offset) {
+  ASSERT_WITHIIN_BOUNDS(offset, m_Lines);
   m_Lines[offset.Y] += m_Lines[offset.Y + 1];
   m_Lines.erase(m_Lines.begin() + offset.Y + 1);
 }
@@ -293,12 +294,12 @@ const Position TextBuffer::GetEOFPosition() const {
 void TextBuffer::Clear() { m_Lines.clear(); }
 
 const std::string &TextBuffer::GetLineAtOffset(int lineOffset) {
-  ASSERT_OR_RETURN(lineOffset >= 0 && lineOffset < m_Lines.size());
+  assert(lineOffset >= 0 && lineOffset < m_Lines.size() &&
+         "Invalid line offset");
   return m_Lines[lineOffset];
 }
 
-char TextBuffer::GetCharAtOffset(Offset offset) {
-  // ASSERT_OR_RETURN(offset.Y >= 0 && offset.Y < m_Lines.size() &&
-  //                  offset.X >= 0 && offset.X < m_Lines[offset.Y].size())
+const char &TextBuffer::GetCharAtOffset(Offset offset) {
+  ASSERT_WITHIIN_BOUNDS(offset, m_Lines);
   return m_Lines[offset.Y][offset.X];
 }

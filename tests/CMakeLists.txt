@@ -4,10 +4,10 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 # Define TESTING macro for compilation
-add_definitions(-DTESTING)
+# add_definitions(-DTESTING)
 
 # List of test source files
-file(GLOB_RECURSE TEST_SOURCE_FILES "*.cpp")
+file(GLOB_RECURSE TEST_SOURCE_FILES "*.cpp" "core/*.cpp")
 
 add_executable(TextEditorTests ${TEST_SOURCE_FILES})
 

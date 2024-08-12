@@ -1,20 +1,9 @@
-#ifndef CUSTOM_ASSERT_H
-#define CUSTOM_ASSERT_H
+#pragma once
 
-#include <cassert>
-#include <string>
+#define ASSERT_WITHIIN_BOUNDS(offset, lines)                                   \
+  assert(offset.Y < lines.size() && offset.Y >= 0 &&                           \
+         offset.X < lines[offset.Y].size() && offset.X >= 0)
 
-inline const std::string SENTINEL_STRING = "<invalid_sentinel>";
-
-#ifdef TESTING
-#define ASSERT_OR_RETURN(condition)                                            \
-  if (!(condition)) {                                                          \
-    return SENTINEL_STRING;                                                    \
-  }
-#else
-#define ASSERT_OR_RETURN(condition)                                            \
-  assert(condition);
-
-#endif // TESTING
-
-#endif // !CUSTOM_ASSERT_H
+#define ASSERT_INSERT_BOUNDS(offset, lines)                                    \
+  assert(offset.Y < lines.size() && offset.Y >= 0 &&                           \
+         offset.X <= lines[offset.Y].size() && offset.X >= 0)

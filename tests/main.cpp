@@ -5,9 +5,8 @@
 #include "InsertNewline.h"
 #include "TextBuffer.h"
 #include "TextController.h"
-#include "custom_assert.h"
 
-TEST(TextControllerTest, InsertCharTest) {
+TEST(TextControllerTest, InsertCharCommandTest) {
   TextBuffer tb;
   TextController textController;
 
@@ -24,10 +23,12 @@ TEST(TextControllerTest, InsertCharTest) {
   textController.Execute(new InsertChar(tb, 'd', {0, 10}));
 
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
-  EXPECT_EQ(&tb.GetLineAtOffset(1), &SENTINEL_STRING);
+  EXPECT_EQ(tb.GetCharAtOffset({0, 10}), 'd');
+  EXPECT_DEATH(tb.GetCharAtOffset({0, 11}), "");
+  EXPECT_DEATH(tb.GetCharAtOffset({1, 0}), "");
 }
 
-TEST(TextControllerTest, InsertCharAndNewLineTest) {
+TEST(TextControllerTest, InsertCharAndNewLineCommandTest) {
   TextBuffer tb;
   TextController textController;
 
@@ -55,8 +56,7 @@ TEST(TextControllerTest, InsertCharAndNewLineTest) {
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
   EXPECT_EQ(tb.GetLineAtOffset(1), "String");
   EXPECT_EQ(tb.GetLineAtOffset(2), "I");
-  EXPECT_EQ(&tb.GetLineAtOffset(3), &SENTINEL_STRING);
-  EXPECT_EQ(&tb.GetLineAtOffset(4), &SENTINEL_STRING);
+  EXPECT_DEATH(tb.GetLineAtOffset(3), "Assertion.*failed");
 }
 
 int main(int argc, char **argv) {

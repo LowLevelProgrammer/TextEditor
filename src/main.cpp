@@ -9,6 +9,7 @@ int main() {
   TextBuffer tb;
 
   textController.Execute(new InsertChar(tb, 'H', {0, 0}));
+  textController.Execute(new InsertChar(tb, 'H', {0, 0}));
   textController.Execute(new InsertChar(tb, 'e', {0, 1}));
   textController.Execute(new InsertChar(tb, 'l', {0, 2}));
   textController.Execute(new InsertChar(tb, 'l', {0, 3}));
@@ -27,11 +28,10 @@ int main() {
   textController.Execute(new InsertChar(tb, 'n', {1, 4}));
   textController.Execute(new InsertChar(tb, 'g', {1, 5}));
   textController.Execute(new InsertNewline(tb, {1, 6}));
-  textController.Execute(new InsertChar(tb, 'I', {2, 0}));
 
   std::cout << "Printing: \n";
   std::cout << tb.GetLineAtOffset(3);
-
+  tb.GetLineAtOffset(3);
   // tb.PrintBuffer();
   //
   // std::cout << "After undo:" << std::endl;

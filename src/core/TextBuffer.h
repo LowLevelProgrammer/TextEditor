@@ -49,7 +49,7 @@ public:
   const Position GetEOFPosition() const;
 
   const std::string &GetLineAtOffset(int lineOffset);
-  char GetCharAtOffset(Offset offset);
+  const char &GetCharAtOffset(Offset offset);
 
   inline const std::vector<std::string> &GetLines() const { return m_Lines; }
   inline const Position &GetCaretPosition() const { return m_CaretPosition; }
