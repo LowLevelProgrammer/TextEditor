@@ -303,3 +303,13 @@ const char &TextBuffer::GetCharAtOffset(Offset offset) {
   ASSERT_WITHIIN_BOUNDS(offset, m_Lines);
   return m_Lines[offset.Y][offset.X];
 }
+
+std::string TextBuffer::GetPrintableTextBuffer() {
+  std::string tb;
+  for (int i = 0; i < m_Lines.size(); i++) {
+    tb += m_Lines[i];
+    if (i < m_Lines.size() - 1)
+      tb += '\n';
+  }
+  return tb;
+}

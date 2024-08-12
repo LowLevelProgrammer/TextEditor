@@ -30,8 +30,8 @@ int main() {
   textController.Execute(new InsertNewline(tb, {1, 6}));
 
   std::cout << "Printing: \n";
-  std::cout << tb.GetLineAtOffset(3);
-  tb.GetLineAtOffset(3);
+  // std::cout << tb.GetLineAtOffset(3);
+  // tb.GetLineAtOffset(3);
   // tb.PrintBuffer();
   //
   // std::cout << "After undo:" << std::endl;

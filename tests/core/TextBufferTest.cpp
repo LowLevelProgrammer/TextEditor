@@ -28,6 +28,15 @@ TEST_F(TextBufferTest, InsertChar) {
   tb.InsertChar('d', {0, 10});
 
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+  EXPECT_EQ(tb.GetPrintableTextBuffer(), "Hello World");
+}
+
+TEST_F(TextBufferTest, InsertNewline) {
+  tb.InsertNewline({0, 5});
+
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
+  EXPECT_EQ(tb.GetLineAtOffset(1), "");
+  EXPECT_EQ(tb.GetPrintableTextBuffer(), "Hello\n");
 }
 
 TEST_F(TextBufferTest, InsertCharAtSecondLine) {
@@ -41,10 +50,23 @@ TEST_F(TextBufferTest, InsertCharAtSecondLine) {
 
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
   EXPECT_EQ(tb.GetLineAtOffset(1), "World");
+  EXPECT_EQ(tb.GetPrintableTextBuffer(), "Hello\nWorld");
 }
 
-TEST_F(TextBufferTest, InsertOutOfBounds) {
+TEST_F(TextBufferTest, InsertCharOutOfBounds) {
   ASSERT_DEATH(tb.InsertChar('W', {0, 6}), "Assertion.*failed");
+}
+
+TEST_F(TextBufferTest, InsertCharOutOfBounds2) {
+  ASSERT_DEATH(tb.InsertChar('W', {1, 0}), "Assertion.*failed");
+}
+
+TEST_F(TextBufferTest, InsertNewlineOutOfBounds) {
+  ASSERT_DEATH(tb.InsertNewline({0, 6}), "Assertion.*failed");
+}
+
+TEST_F(TextBufferTest, InsertNewlineOutOfBounds2) {
+  ASSERT_DEATH(tb.InsertNewline({1, 0}), "Assertion.*failed");
 }
 
 TEST_F(TextBufferTest, EraseCharTest) {
@@ -57,6 +79,7 @@ TEST_F(TextBufferTest, EraseCharTest) {
   tb.EraseChar({0, 0});
 
   EXPECT_EQ(tb.GetLineAtOffset(0), "");
+  EXPECT_EQ(tb.GetPrintableTextBuffer(), "");
 }
 
 TEST_F(TextBufferTest, EraseCharTest2) {
@@ -69,6 +92,8 @@ TEST_F(TextBufferTest, EraseCharTest2) {
   tb.EraseChar({0, 0});
 
   EXPECT_EQ(tb.GetLineAtOffset(0), "");
+  EXPECT_EQ(tb.GetPrintableTextBuffer(), "");
+
   ASSERT_DEATH(tb.EraseChar({0, 0}), "Assertion.*failed");
 }
 

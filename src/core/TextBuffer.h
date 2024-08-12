@@ -50,6 +50,7 @@ public:
 
   const std::string &GetLineAtOffset(int lineOffset);
   const char &GetCharAtOffset(Offset offset);
+  std::string GetPrintableTextBuffer();
 
   inline const std::vector<std::string> &GetLines() const { return m_Lines; }
   inline const Position &GetCaretPosition() const { return m_CaretPosition; }
