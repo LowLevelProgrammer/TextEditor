@@ -3,17 +3,17 @@
 #include "TextBuffer.h"
 #include "Transaction.h"
 
-class InsertChar : public Transaction {
+class EraseNewline : public Transaction {
 public:
-  InsertChar(TextBuffer &textBuffer, char data, Offset offset);
+  EraseNewline(TextBuffer &textBuffer, Offset offset);
+  ~EraseNewline();
 
   std::string TransactionDetails();
   void Execute() override;
   void Undo() override;
   void Redo() override;
 
-protected:
+private:
   TextBuffer &m_TextBuffer;
-  char m_Character;
   Offset m_Offset;
 };

@@ -42,14 +42,15 @@ public:
   void InsertBuffer(Register reg);
   void DeleteSelection();
 
-  bool IsStartOfLine(int yOffset, int xOffset);
-  bool IsSOF(int yOffset, int xOffset);
+  bool IsStartOfLine(Position position);
+  bool IsSOF(Position position);
   bool IsEOF();
   void Clear();
   const Position GetEOFPosition() const;
 
   const std::string &GetLineAtOffset(int lineOffset);
   const char &GetCharAtOffset(Offset offset);
+  int GetLineSizeAtOffset(int lineOffset);
   std::string GetPrintableTextBuffer();
 
   inline const std::vector<std::string> &GetLines() const { return m_Lines; }

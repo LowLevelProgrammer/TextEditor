@@ -14,7 +14,7 @@ std::string InsertNewline::TransactionDetails() {
 }
 void InsertNewline::Execute() {
   m_TextBuffer.InsertNewline(m_Offset);
-  std::cout << TransactionDetails();
+  // std::cout << TransactionDetails();
 }
 
 void InsertNewline::Undo() {

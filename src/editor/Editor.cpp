@@ -1,6 +1,12 @@
 #include "Editor.h"
+#include "EraseChar.h"
+#include "EraseNewline.h"
+#include "InsertChar.h"
+#include "InsertNewline.h"
+#include "TextBuffer.h"
 
 #include <string>
+#include <sys/types.h>
 
 Editor::Editor() : m_TextBuffer(), m_FileHandler() {
   m_Register = new Register[10];
@@ -12,9 +18,52 @@ Editor::Editor() : m_TextBuffer(), m_FileHandler() {
 
 Editor::~Editor() { delete[] (m_Register); }
 
-void Editor::InsertChar(char character) {}
+void Editor::InsertChar(char character) {
+  Position caretPosition = m_TextBuffer.GetCaretPosition();
+  Offset caretOffset = {caretPosition.Line - 1, caretPosition.Column - 1};
 
-void Editor::BackSpace() {}
+  switch (character) {
+  case '\n':
+    m_TextController.Execute(new InsertNewline(m_TextBuffer, caretOffset));
+    m_TextBuffer.SetCaretPosition({caretPosition.Line + 1, 1});
+    break;
+  default:
+    m_TextController.Execute(
+        new ::InsertChar(m_TextBuffer, character, caretOffset));
+    m_TextBuffer.SetCaretPosition(
+        {caretPosition.Line, caretPosition.Column + 1});
+    break;
+  }
+}
+
+void Editor::BackSpace() {
+  Position caretPosition = m_TextBuffer.GetCaretPosition();
+
+  if (m_TextBuffer.IsSOF(caretPosition))
+    return;
+
+  if (m_TextBuffer.IsStartOfLine(caretPosition)) {
+    int currentLineYOffset = caretPosition.Line - 1;
+    int prevLineYOffset = currentLineYOffset - 1;
+    int prevLineSize = m_TextBuffer.GetLineSizeAtOffset(prevLineYOffset);
+
+    Offset newlineCharOffset = {prevLineYOffset, prevLineSize};
+
+    m_TextController.Execute(new EraseNewline(m_TextBuffer, newlineCharOffset));
+    m_TextBuffer.SetCaretPosition({caretPosition.Line - 1, prevLineSize + 1});
+
+  } else {
+    Offset charToRemoveOffset = {caretPosition.Line - 1,
+                                 caretPosition.Column - 2};
+    m_TextController.Execute(new EraseChar(m_TextBuffer, charToRemoveOffset));
+    m_TextBuffer.SetCaretPosition(
+        {caretPosition.Line, caretPosition.Column - 1});
+  }
+
+  Offset charToRemoveOffset = {caretPosition.Line - 1,
+                               caretPosition.Column - 2};
+}
+
 void Editor::Select(Position startPosition, Position endPosition) {
   m_TextBuffer.Select(startPosition, endPosition);
 }

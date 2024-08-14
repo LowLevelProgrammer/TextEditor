@@ -3,6 +3,7 @@
 #include "FileHandler.h"
 #include "Register.h"
 #include "TextBuffer.h"
+#include "TextController.h"
 #include <string>
 #include <vector>
 
@@ -44,4 +45,5 @@ private:
   // Registers are 0-Indexed
   Register *m_Register;
   FileHandler m_FileHandler;
+  TextController m_TextController;
 };

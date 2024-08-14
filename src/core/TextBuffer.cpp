@@ -18,12 +18,12 @@ TextBuffer::~TextBuffer() {}
 
 // Wrapper for std::insert function
 void TextBuffer::InsertChar(char character, Offset offset) {
-  ASSERT_INSERT_BOUNDS(offset, m_Lines);
+  ASSERT_WITHIN_OR_EDGE_BOUNDS(offset, m_Lines);
   m_Lines[offset.Y].insert(m_Lines[offset.Y].begin() + offset.X, character);
 }
 
 void TextBuffer::InsertNewline(Offset offset) {
-  ASSERT_INSERT_BOUNDS(offset, m_Lines);
+  ASSERT_WITHIN_OR_EDGE_BOUNDS(offset, m_Lines);
   std::string stringToMove = m_Lines[offset.Y].substr(offset.X);
   m_Lines[offset.Y].erase(offset.X);
 
@@ -38,7 +38,7 @@ void TextBuffer::EraseChar(Offset offset) {
 }
 
 void TextBuffer::EraseNewline(Offset offset) {
-  ASSERT_WITHIIN_BOUNDS(offset, m_Lines);
+  ASSERT_WITHIN_OR_EDGE_BOUNDS(offset, m_Lines);
   m_Lines[offset.Y] += m_Lines[offset.Y + 1];
   m_Lines.erase(m_Lines.begin() + offset.Y + 1);
 }
@@ -264,18 +264,12 @@ void TextBuffer::InsertBuffer(Register reg) {
   m_Lines[line].insert(0, buffer[buffer.size() - 1]);
 }
 
-bool TextBuffer::IsStartOfLine(int yOffset, int xOffset) {
-  int maxYOffset = m_Lines.size();
-
-  if (yOffset > maxYOffset) {
-    std::cerr << "StartOfLine fn error: Invalid Y offset" << std::endl;
-    exit(-1);
-  }
-  return xOffset == -1;
+bool TextBuffer::IsStartOfLine(Position position) {
+  return position.Column == 1;
 }
 
-bool TextBuffer::IsSOF(int yOffset, int xOffset) {
-  return (yOffset == 0 && xOffset == -1);
+bool TextBuffer::IsSOF(Position position) {
+  return (position.Line == 1 && position.Column == 1);
 }
 
 bool TextBuffer::IsEOF() {
@@ -294,9 +288,13 @@ const Position TextBuffer::GetEOFPosition() const {
 void TextBuffer::Clear() { m_Lines.clear(); }
 
 const std::string &TextBuffer::GetLineAtOffset(int lineOffset) {
-  assert(lineOffset >= 0 && lineOffset < m_Lines.size() &&
-         "Invalid line offset");
+  ASSERT_WITHIN_LINE_BOUNDS(lineOffset, m_Lines);
   return m_Lines[lineOffset];
+}
+
+int TextBuffer::GetLineSizeAtOffset(int lineOffset) {
+  ASSERT_WITHIN_LINE_BOUNDS(lineOffset, m_Lines);
+  return m_Lines[lineOffset].size();
 }
 
 const char &TextBuffer::GetCharAtOffset(Offset offset) {

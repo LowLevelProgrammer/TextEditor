@@ -16,7 +16,7 @@ std::string EraseChar::TransactionDetails() {
 void EraseChar::Execute() {
   m_RemovedChar = m_TextBuffer.GetCharAtOffset(m_Offset);
   m_TextBuffer.EraseChar(m_Offset);
-  std::cout << TransactionDetails();
+  // std::cout << TransactionDetails();
 }
 
 void EraseChar::Undo() {

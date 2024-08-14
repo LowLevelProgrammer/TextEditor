@@ -16,7 +16,7 @@ std::string InsertChar::TransactionDetails() {
 
 void InsertChar::Execute() {
   m_TextBuffer.InsertChar(m_Character, m_Offset);
-  std::cout << TransactionDetails();
+  // std::cout << TransactionDetails();
 }
 
 void InsertChar::Undo() {
