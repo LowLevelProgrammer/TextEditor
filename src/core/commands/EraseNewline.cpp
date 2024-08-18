@@ -4,7 +4,9 @@
 #include <sstream>
 
 EraseNewline::EraseNewline(TextBuffer &textBuffer, Offset offset)
-    : m_TextBuffer(textBuffer), m_Offset(offset) {}
+    : m_TextBuffer(textBuffer), m_Offset(offset) {
+  m_TransactionType = TransactionType::EraseNewline;
+}
 EraseNewline::~EraseNewline() {}
 
 std::string EraseNewline::TransactionDetails() {
@@ -16,6 +18,9 @@ std::string EraseNewline::TransactionDetails() {
 
 void EraseNewline::Execute() { m_TextBuffer.EraseNewline(m_Offset); }
 
-void EraseNewline::Undo() {}
+void EraseNewline::Undo() {
+  m_TextBuffer.InsertNewline(m_Offset);
+  // std::cout << "Undid: " << TransactionDetails();
+}
 
 void EraseNewline::Redo() {}

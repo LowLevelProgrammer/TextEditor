@@ -2,6 +2,7 @@
 
 #include "TextBuffer.h"
 #include "Transaction.h"
+
 class EraseChar : public Transaction {
 public:
   EraseChar(TextBuffer &textBuffer, Offset offset);

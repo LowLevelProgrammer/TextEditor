@@ -12,6 +12,9 @@ public:
   void Undo();
   void Redo();
 
+  bool CanUndo() const;
+  TransactionType GetRecentTransactionType() const;
+
 private:
   std::vector<Transaction *> m_UndoStack;
   std::vector<Transaction *> m_RedoStack;

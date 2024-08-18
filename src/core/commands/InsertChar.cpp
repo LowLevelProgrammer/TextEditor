@@ -4,7 +4,9 @@
 #include <sstream>
 
 InsertChar::InsertChar(TextBuffer &textBuffer, char data, Offset offset)
-    : m_TextBuffer(textBuffer), m_Character(data), m_Offset(offset) {}
+    : m_TextBuffer(textBuffer), m_Character(data), m_Offset(offset) {
+  m_TransactionType = TransactionType::InsertChar;
+}
 
 std::string InsertChar::TransactionDetails() {
   std::stringstream ss;
@@ -21,7 +23,7 @@ void InsertChar::Execute() {
 
 void InsertChar::Undo() {
   m_TextBuffer.EraseChar(m_Offset);
-  std::cout << "Undid: " << TransactionDetails();
+  // std::cout << "Undid: " << TransactionDetails();
 }
 
 void InsertChar::Redo() {

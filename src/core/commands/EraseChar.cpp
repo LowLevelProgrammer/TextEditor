@@ -4,7 +4,9 @@
 #include <sstream>
 
 EraseChar::EraseChar(TextBuffer &textBuffer, Offset offset)
-    : m_TextBuffer(textBuffer), m_Offset(offset) {}
+    : m_TextBuffer(textBuffer), m_Offset(offset) {
+  m_TransactionType = TransactionType::EraseChar;
+}
 
 std::string EraseChar::TransactionDetails() {
   std::stringstream ss;
@@ -21,7 +23,7 @@ void EraseChar::Execute() {
 
 void EraseChar::Undo() {
   m_TextBuffer.InsertChar(m_RemovedChar, m_Offset);
-  std::cout << "Undid: " << TransactionDetails();
+  // std::cout << "Undid: " << TransactionDetails();
 }
 
 void EraseChar::Redo() {

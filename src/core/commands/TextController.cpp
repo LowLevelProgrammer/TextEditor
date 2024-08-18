@@ -1,5 +1,6 @@
 #include "TextController.h"
 #include "Transaction.h"
+#include <cassert>
 
 TextController::TextController() {}
 TextController::~TextController() {}
@@ -28,4 +29,11 @@ void TextController::Redo() {
   m_RedoStack.pop_back();
   lastTransaction->Redo();
   m_UndoStack.push_back(lastTransaction);
+}
+
+bool TextController::CanUndo() const { return !m_UndoStack.empty(); }
+
+TransactionType TextController::GetRecentTransactionType() const {
+  assert(!m_UndoStack.empty());
+  return m_UndoStack.back()->GetTransactionType();
 }

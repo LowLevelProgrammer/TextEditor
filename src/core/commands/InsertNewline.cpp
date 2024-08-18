@@ -4,7 +4,9 @@
 #include <sstream>
 
 InsertNewline::InsertNewline(TextBuffer &textBuffer, Offset offset)
-    : m_TextBuffer(textBuffer), m_Offset(offset) {}
+    : m_TextBuffer(textBuffer), m_Offset(offset) {
+  m_TransactionType = TransactionType::InsertNewline;
+}
 
 std::string InsertNewline::TransactionDetails() {
   std::stringstream ss;
@@ -19,7 +21,7 @@ void InsertNewline::Execute() {
 
 void InsertNewline::Undo() {
   m_TextBuffer.EraseNewline(m_Offset);
-  std::cout << "Undid: " << TransactionDetails();
+  // std::cout << "Undid: " << TransactionDetails();
 }
 
 void InsertNewline::Redo() {
