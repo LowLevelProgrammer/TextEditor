@@ -59,9 +59,6 @@ void Editor::BackSpace() {
     m_TextBuffer.SetCaretPosition(
         {caretPosition.Line, caretPosition.Column - 1});
   }
-
-  Offset charToRemoveOffset = {caretPosition.Line - 1,
-                               caretPosition.Column - 2};
 }
 
 void Editor::Select(Position startPosition, Position endPosition) {

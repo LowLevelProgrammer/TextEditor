@@ -48,10 +48,11 @@ public:
   void Clear();
   const Position GetEOFPosition() const;
 
-  const std::string &GetLineAtOffset(int lineOffset);
-  const char &GetCharAtOffset(Offset offset);
-  int GetLineSizeAtOffset(int lineOffset);
-  std::string GetPrintableTextBuffer();
+  int GetNumberOfLines() const;
+  const std::string &GetLineAtOffset(int lineOffset) const;
+  const char &GetCharAtOffset(Offset offset) const;
+  int GetLineSizeAtOffset(int lineOffset) const;
+  std::string GetPrintableTextBuffer() const;
 
   inline const std::vector<std::string> &GetLines() const { return m_Lines; }
   inline const Position &GetCaretPosition() const { return m_CaretPosition; }

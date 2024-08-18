@@ -33,7 +33,7 @@ void TextBuffer::InsertNewline(Offset offset) {
 
 // Wrapper around the string::erase function
 void TextBuffer::EraseChar(Offset offset) {
-  ASSERT_WITHIIN_BOUNDS(offset, m_Lines);
+  ASSERT_WITHIN_BOUNDS(offset, m_Lines);
   m_Lines[offset.Y].erase(m_Lines[offset.Y].begin() + offset.X);
 }
 
@@ -287,22 +287,24 @@ const Position TextBuffer::GetEOFPosition() const {
 
 void TextBuffer::Clear() { m_Lines.clear(); }
 
-const std::string &TextBuffer::GetLineAtOffset(int lineOffset) {
+int TextBuffer::GetNumberOfLines() const { return m_Lines.size(); }
+
+const std::string &TextBuffer::GetLineAtOffset(int lineOffset) const {
   ASSERT_WITHIN_LINE_BOUNDS(lineOffset, m_Lines);
   return m_Lines[lineOffset];
 }
 
-int TextBuffer::GetLineSizeAtOffset(int lineOffset) {
+int TextBuffer::GetLineSizeAtOffset(int lineOffset) const {
   ASSERT_WITHIN_LINE_BOUNDS(lineOffset, m_Lines);
   return m_Lines[lineOffset].size();
 }
 
-const char &TextBuffer::GetCharAtOffset(Offset offset) {
-  ASSERT_WITHIIN_BOUNDS(offset, m_Lines);
+const char &TextBuffer::GetCharAtOffset(Offset offset) const {
+  ASSERT_WITHIN_BOUNDS(offset, m_Lines);
   return m_Lines[offset.Y][offset.X];
 }
 
-std::string TextBuffer::GetPrintableTextBuffer() {
+std::string TextBuffer::GetPrintableTextBuffer() const {
   std::string tb;
   for (int i = 0; i < m_Lines.size(); i++) {
     tb += m_Lines[i];

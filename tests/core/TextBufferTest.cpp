@@ -34,6 +34,7 @@ TEST_F(TextBufferTest, InsertChar) {
 TEST_F(TextBufferTest, InsertNewline) {
   tb.InsertNewline({0, 5});
 
+  EXPECT_EQ(tb.GetNumberOfLines(), 2);
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
   EXPECT_EQ(tb.GetLineAtOffset(1), "");
   EXPECT_EQ(tb.GetPrintableTextBuffer(), "Hello\n");
@@ -54,25 +55,30 @@ TEST_F(TextBufferTest, InsertCharAtSecondLine) {
 }
 
 TEST_F(TextBufferTest, InsertCharOutOfBounds) {
-  ASSERT_DEATH(tb.InsertChar('W', {0, 6}), "Assertion.*failed");
+  ASSERT_DEATH(tb.InsertChar('W', {0, 6}),
+               "Offset not within or at the edge of the bounds");
 }
 
 TEST_F(TextBufferTest, InsertCharOutOfBounds2) {
-  ASSERT_DEATH(tb.InsertChar('W', {1, 0}), "Assertion.*failed");
+  ASSERT_DEATH(tb.InsertChar('W', {1, 0}),
+               "Offset not within or at the edge of the bounds");
 }
 
 TEST_F(TextBufferTest, InsertNewlineOutOfBounds) {
-  ASSERT_DEATH(tb.InsertNewline({0, 6}), "Assertion.*failed");
+  ASSERT_DEATH(tb.InsertNewline({0, 6}),
+               "Offset not within or at the edge of the bounds");
 }
 
 TEST_F(TextBufferTest, InsertNewlineOutOfBounds2) {
-  ASSERT_DEATH(tb.InsertNewline({1, 0}), "Assertion.*failed");
+  ASSERT_DEATH(tb.InsertNewline({1, 0}),
+               "Offset not within or at the edge of the bounds");
 }
 
 TEST_F(TextBufferTest, EraseCharTest) {
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
 
   tb.EraseChar({0, 4});
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hell");
   tb.EraseChar({0, 3});
   tb.EraseChar({0, 2});
   tb.EraseChar({0, 1});
@@ -86,6 +92,7 @@ TEST_F(TextBufferTest, EraseCharTest2) {
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
 
   tb.EraseChar({0, 0});
+  EXPECT_EQ(tb.GetLineAtOffset(0), "ello");
   tb.EraseChar({0, 0});
   tb.EraseChar({0, 0});
   tb.EraseChar({0, 0});
@@ -94,9 +101,10 @@ TEST_F(TextBufferTest, EraseCharTest2) {
   EXPECT_EQ(tb.GetLineAtOffset(0), "");
   EXPECT_EQ(tb.GetPrintableTextBuffer(), "");
 
-  ASSERT_DEATH(tb.EraseChar({0, 0}), "Assertion.*failed");
+  ASSERT_DEATH(tb.EraseChar({0, 0}), "Offset not within bounds");
 }
 
 TEST_F(TextBufferTest, EraseOutOfBounds) {
-  ASSERT_DEATH(tb.EraseChar({0, 5}), "Assertion.*failed");
+  EXPECT_DEATH(tb.EraseChar({0, 5}), "Offset not within bounds");
+  EXPECT_DEATH(tb.EraseChar({0, -1}), "Offset not within bounds");
 }
