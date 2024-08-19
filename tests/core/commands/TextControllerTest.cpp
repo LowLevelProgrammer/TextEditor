@@ -134,3 +134,119 @@ TEST_F(TextControllerTest, InsertAtSecondLine) {
   EXPECT_DEATH(tb.GetCharAtOffset({2, 0}), "Offset not within bounds");
   EXPECT_DEATH(tb.GetLineAtOffset(2), "Line offset not within bounds");
 }
+
+TEST_F(TextControllerTest, UndoSingleInsertChar) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Undo the last insert ("d")
+  textController.Undo();
+
+  // Now the state should be "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+}
+
+TEST_F(TextControllerTest, UndoMultipleInsertChars) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Undo the last two inserts ("d" and "l")
+  textController.Undo();
+  textController.Undo();
+
+  // Now the state should be "Hello Wor"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Wor");
+}
+
+TEST_F(TextControllerTest, UndoAfterEraseChar) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Erase the last character ("d")
+  textController.Execute(new EraseChar(tb, {0, 10}));
+
+  // Now the state should be "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  // Undo the erase
+  textController.Undo();
+
+  // The state should be back to "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Undo the initial insert
+  textController.Undo();
+
+  // The state should be back to "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  // Undo the initial insert
+  textController.Undo();
+
+  // The state should be back to "Hello Wor"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Wor");
+}
+
+TEST_F(TextControllerTest, UndoMixedOperations) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Erase the last character ("d")
+  textController.Execute(new EraseChar(tb, {0, 10}));
+  // Insert "!"
+  textController.Execute(new InsertChar(tb, '!', {0, 10}));
+
+  // Now the state should be "Hello Worl!"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl!");
+
+  // Undo the insert ("!")
+  textController.Undo();
+
+  // The state should be back to "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  // Undo the erase ("d")
+  textController.Undo();
+
+  // The state should be back to "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Undo the insert ("d")
+  textController.Undo();
+
+  // The state should be back to "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  // Undo the insert ("l")
+  textController.Undo();
+
+  // The state should be back to "Hello Wor"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Wor");
+}
+
+TEST_F(TextControllerTest, UndoWithNoActions) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Perform a valid undo
+  textController.Undo();
+
+  // Now the state should be "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  // Try undoing multiple times
+  textController.Undo(); // Undo "l"
+  textController.Undo(); // Undo "r"
+  textController.Undo(); // Undo "o"
+  textController.Undo(); // Undo "W"
+  textController.Undo(); // Undo space
+  textController.Undo(); // Undo "o"
+  textController.Undo(); // Undo "l"
+  textController.Undo(); // Undo "l"
+  textController.Undo(); // Undo "e"
+  textController.Undo(); // Undo "H"
+  textController.Undo(); // Should do nothing as the stack is empty
+
+  // The state should be empty since all characters were undone
+  EXPECT_EQ(tb.GetLineAtOffset(0), "");
+}
