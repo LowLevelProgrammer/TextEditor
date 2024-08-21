@@ -28,5 +28,5 @@ void EraseChar::Undo() {
 
 void EraseChar::Redo() {
   m_TextBuffer.EraseChar(m_Offset);
-  std::cout << "Redid: " << TransactionDetails();
+  // std::cout << "Redid: " << TransactionDetails();
 }

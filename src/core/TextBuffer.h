@@ -48,7 +48,7 @@ public:
   void Clear();
   const Position GetEOFPosition() const;
 
-  int GetNumberOfLines() const;
+  int GetLineCount() const;
   const std::string &GetLineAtOffset(int lineOffset) const;
   const char &GetCharAtOffset(Offset offset) const;
   int GetLineSizeAtOffset(int lineOffset) const;

@@ -4,6 +4,7 @@
 #include "TextController.h"
 
 #include "EraseChar.h"
+#include "EraseNewline.h"
 #include "InsertChar.h"
 #include "InsertNewline.h"
 #include "TextBuffer.h"
@@ -125,7 +126,7 @@ TEST_F(TextControllerTest, InsertAtSecondLine) {
   textController.Execute(new InsertChar(tb, 'n', {1, 11}));
   textController.Execute(new InsertChar(tb, 'g', {1, 12}));
 
-  EXPECT_EQ(tb.GetNumberOfLines(), 2);
+  EXPECT_EQ(tb.GetLineCount(), 2);
   EXPECT_EQ(tb.GetLineAtOffset(1), "Random String");
   EXPECT_EQ(tb.GetPrintableTextBuffer(), "Hello World\nRandom String");
   EXPECT_EQ(tb.GetCharAtOffset({1, 12}), 'g');
@@ -249,4 +250,263 @@ TEST_F(TextControllerTest, UndoWithNoActions) {
 
   // The state should be empty since all characters were undone
   EXPECT_EQ(tb.GetLineAtOffset(0), "");
+}
+
+TEST_F(TextControllerTest, RedoSingleInsertChar) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Undo the last insert ("d")
+  textController.Undo();
+  // Now the state should be "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  // Redo the last action, which should re-insert "d"
+  textController.Redo();
+  // The state should be back to "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+}
+
+TEST_F(TextControllerTest, RedoMultipleInsertChars) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Undo the last two inserts ("d" and "l")
+  textController.Undo();
+  textController.Undo();
+
+  // Now the state should be "Hello Wor"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Wor");
+
+  // Redo the last action, which should re-insert "l"
+  textController.Redo();
+  // Redo the next action, which should re-insert "d"
+  textController.Redo();
+
+  // The state should be back to "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+}
+
+TEST_F(TextControllerTest, RedoAfterEraseChar) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Erase the last character ("d")
+  textController.Execute(new EraseChar(tb, {0, 10}));
+
+  // Now the state should be "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  // Undo the erase
+  textController.Undo();
+
+  // The state should be back to "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Redo the erase
+  textController.Redo();
+
+  // The state should be back to "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+}
+
+TEST_F(TextControllerTest, RedoAfterMixedOperations) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Erase the last character ("d")
+  textController.Execute(new EraseChar(tb, {0, 10}));
+  // Insert "!"
+  textController.Execute(new InsertChar(tb, '!', {0, 10}));
+
+  // Now the state should be "Hello Worl!"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl!");
+
+  // Undo the insert ("!")
+  textController.Undo();
+  // Undo the erase ("d")
+  textController.Undo();
+
+  // The state should be back to "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Redo the erase ("d")
+  textController.Redo();
+
+  // Now the state should be "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  // Redo the insert ("!")
+  textController.Redo();
+
+  // Now the state should be "Hello Worl!"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl!");
+}
+
+TEST_F(TextControllerTest, RedoWithNoActions) {
+  // Initial state should be "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Undo the last insert ("d")
+  textController.Undo();
+
+  // Now the state should be "Hello Worl"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  // Redo the last action, which should re-insert "d"
+  textController.Redo();
+
+  // The state should be back to "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  // Try redoing again, which should do nothing
+  textController.Redo();
+
+  // The state should remain "Hello World"
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+}
+
+TEST_F(TextControllerTest, InsertCharRedoTest) {
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+}
+
+TEST_F(TextControllerTest, InsertNewlineRedoTest) {
+  textController.Execute(new InsertNewline(tb, {0, 5}));
+  EXPECT_EQ(tb.GetLineCount(), 2);
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineCount(), 1);
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineCount(), 2);
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+}
+
+TEST_F(TextControllerTest, EraseNewlineRedoTest) {
+  textController.Execute(new InsertNewline(tb, {0, 5}));
+  textController.Execute(new EraseNewline(tb, {0, 5}));
+  EXPECT_EQ(tb.GetLineCount(), 1);
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineCount(), 2);
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineCount(), 1);
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+}
+
+TEST_F(TextControllerTest, EraseCharRedoTest) {
+  textController.Execute(new EraseChar(tb, {0, 10}));
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Worl");
+}
+
+TEST_F(TextControllerTest, ComplexRedoTest) {
+  textController.Execute(new InsertNewline(tb, {0, 5}));
+  textController.Execute(new InsertChar(tb, 'A', {1, 0}));
+  textController.Execute(new EraseChar(tb, {1, 0}));
+
+  EXPECT_EQ(tb.GetLineCount(), 2);
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineAtOffset(1), "A World");
+
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineCount(), 2);
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineCount(), 1);
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineCount(), 2);
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineAtOffset(1), "A World");
+
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+}
+
+TEST_F(TextControllerTest, ComplexRedoTest2) {
+  // Initial buffer:
+  // Line 0: "Hello World"
+
+  // Insert newline at {0, 5}
+  textController.Execute(new InsertNewline(tb, {0, 5}));
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+
+  // Insert 'A' at {1, 1}
+  textController.Execute(new InsertChar(tb, 'A', {1, 1}));
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
+  EXPECT_EQ(tb.GetLineAtOffset(1), " AWorld");
+
+  // Undo 'A' insertion
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+
+  // Undo newline insertion
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+  EXPECT_EQ(tb.GetLineCount(), 1);
+
+  // Redo newline insertion
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
+  EXPECT_EQ(tb.GetLineAtOffset(1), " World");
+
+  // Redo 'A' insertion
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
+  EXPECT_EQ(tb.GetLineAtOffset(1), " AWorld");
+
+  // Insert newline at {1, 2}
+  textController.Execute(new InsertNewline(tb, {1, 2}));
+  EXPECT_EQ(tb.GetLineCount(), 3);
+  EXPECT_EQ(tb.GetLineAtOffset(1), " A");
+  EXPECT_EQ(tb.GetLineAtOffset(2), "World");
+
+  // Erase 'W' at {2, 0}
+  textController.Execute(new EraseChar(tb, {2, 0}));
+  EXPECT_EQ(tb.GetLineAtOffset(1), " A");
+  EXPECT_EQ(tb.GetLineAtOffset(2), "orld");
+
+  // Undo erase 'W'
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineAtOffset(1), " A");
+  EXPECT_EQ(tb.GetLineAtOffset(2), "World");
+
+  // Undo newline at {1, 2}
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
+  EXPECT_EQ(tb.GetLineAtOffset(1), " AWorld");
+
+  // Redo newline at {1, 2}
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineAtOffset(1), " A");
+  EXPECT_EQ(tb.GetLineAtOffset(2), "World");
+
+  // Redo erase 'W'
+  textController.Redo();
+  EXPECT_EQ(tb.GetLineAtOffset(1), " A");
+  EXPECT_EQ(tb.GetLineAtOffset(2), "orld");
 }

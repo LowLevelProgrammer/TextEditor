@@ -28,5 +28,5 @@ void InsertChar::Undo() {
 
 void InsertChar::Redo() {
   m_TextBuffer.InsertChar(m_Character, m_Offset);
-  std::cout << "Redid: " << TransactionDetails();
+  // std::cout << "Redid: " << TransactionDetails();
 }

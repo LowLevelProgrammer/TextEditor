@@ -287,7 +287,7 @@ const Position TextBuffer::GetEOFPosition() const {
 
 void TextBuffer::Clear() { m_Lines.clear(); }
 
-int TextBuffer::GetNumberOfLines() const { return m_Lines.size(); }
+int TextBuffer::GetLineCount() const { return m_Lines.size(); }
 
 const std::string &TextBuffer::GetLineAtOffset(int lineOffset) const {
   ASSERT_WITHIN_LINE_BOUNDS(lineOffset, m_Lines);

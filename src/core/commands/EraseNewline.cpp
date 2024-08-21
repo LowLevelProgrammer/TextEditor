@@ -16,11 +16,17 @@ std::string EraseNewline::TransactionDetails() {
   return ss.str();
 }
 
-void EraseNewline::Execute() { m_TextBuffer.EraseNewline(m_Offset); }
+void EraseNewline::Execute() {
+  m_TextBuffer.EraseNewline(m_Offset);
+  // std::cout << TransactionDetails();
+}
 
 void EraseNewline::Undo() {
   m_TextBuffer.InsertNewline(m_Offset);
   // std::cout << "Undid: " << TransactionDetails();
 }
 
-void EraseNewline::Redo() {}
+void EraseNewline::Redo() {
+  m_TextBuffer.EraseNewline(m_Offset);
+  // std::cout << "Redid: " << TransactionDetails();
+}

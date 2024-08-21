@@ -34,7 +34,7 @@ TEST_F(TextBufferTest, InsertChar) {
 TEST_F(TextBufferTest, InsertNewline) {
   tb.InsertNewline({0, 5});
 
-  EXPECT_EQ(tb.GetNumberOfLines(), 2);
+  EXPECT_EQ(tb.GetLineCount(), 2);
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello");
   EXPECT_EQ(tb.GetLineAtOffset(1), "");
   EXPECT_EQ(tb.GetPrintableTextBuffer(), "Hello\n");

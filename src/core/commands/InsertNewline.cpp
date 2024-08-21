@@ -26,5 +26,5 @@ void InsertNewline::Undo() {
 
 void InsertNewline::Redo() {
   m_TextBuffer.InsertNewline(m_Offset);
-  std::cout << "Redid: " << TransactionDetails();
+  // std::cout << "Redid: " << TransactionDetails();
 }
