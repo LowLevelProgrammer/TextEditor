@@ -1,10 +1,10 @@
 #include "Editor.h"
+#include "Command.h"
 #include "EraseChar.h"
 #include "EraseNewline.h"
 #include "InsertChar.h"
 #include "InsertNewline.h"
 #include "TextBuffer.h"
-#include "Transaction.h"
 
 #include <string>
 #include <sys/types.h>
@@ -69,7 +69,7 @@ void Editor::Select(Position startPosition, Position endPosition) {
 void Editor::Undo() {
 
   if (m_TextController.CanUndo()) {
-    TransactionType recentTransactionType =
+    CommandType recentTransactionType =
         m_TextController.GetRecentTransactionType();
 
     Position caretPosition = m_TextBuffer.GetCaretPosition();
@@ -77,12 +77,12 @@ void Editor::Undo() {
 
     // Set caret position
     switch (recentTransactionType) {
-    case TransactionType::InsertChar:
+    case CommandType::InsertChar:
       // Same as caret position after removing a char
       m_TextBuffer.SetCaretPosition(
           {caretPosition.Line, caretPosition.Column - 1});
       break;
-    case TransactionType::InsertNewline:
+    case CommandType::InsertNewline:
       // Same as caret position after removing a newline
       {
         int currentLineYOffset = caretPosition.Line - 1;
@@ -92,12 +92,12 @@ void Editor::Undo() {
             {caretPosition.Line - 1, prevLineSize + 1});
       }
       break;
-    case TransactionType::EraseChar:
+    case CommandType::EraseChar:
       // Same as caret position after inserting a char
       m_TextBuffer.SetCaretPosition(
           {caretPosition.Line, caretPosition.Column + 1});
       break;
-    case TransactionType::EraseNewline:
+    case CommandType::EraseNewline:
       // Same as caret position after inserting a newline
       m_TextBuffer.SetCaretPosition({caretPosition.Line + 1, 1});
       break;

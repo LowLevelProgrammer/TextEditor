@@ -5,7 +5,7 @@
 
 InsertChar::InsertChar(TextBuffer &textBuffer, char data, Offset offset)
     : m_TextBuffer(textBuffer), m_Character(data), m_Offset(offset) {
-  m_TransactionType = TransactionType::InsertChar;
+  m_CommandType = CommandType::InsertChar;
 }
 
 std::string InsertChar::TransactionDetails() {

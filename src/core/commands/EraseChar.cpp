@@ -5,7 +5,7 @@
 
 EraseChar::EraseChar(TextBuffer &textBuffer, Offset offset)
     : m_TextBuffer(textBuffer), m_Offset(offset) {
-  m_TransactionType = TransactionType::EraseChar;
+  m_CommandType = CommandType::EraseChar;
 }
 
 std::string EraseChar::TransactionDetails() {

@@ -5,7 +5,7 @@
 
 InsertNewline::InsertNewline(TextBuffer &textBuffer, Offset offset)
     : m_TextBuffer(textBuffer), m_Offset(offset) {
-  m_TransactionType = TransactionType::InsertNewline;
+  m_CommandType = CommandType::InsertNewline;
 }
 
 std::string InsertNewline::TransactionDetails() {

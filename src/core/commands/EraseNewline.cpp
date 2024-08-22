@@ -5,7 +5,7 @@
 
 EraseNewline::EraseNewline(TextBuffer &textBuffer, Offset offset)
     : m_TextBuffer(textBuffer), m_Offset(offset) {
-  m_TransactionType = TransactionType::EraseNewline;
+  m_CommandType = CommandType::EraseNewline;
 }
 EraseNewline::~EraseNewline() {}
 

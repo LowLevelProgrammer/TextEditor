@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Command.h"
 #include "TextBuffer.h"
-#include "Transaction.h"
 
-class InsertChar : public Transaction {
+class InsertChar : public Command {
 public:
   InsertChar(TextBuffer &textBuffer, char data, Offset offset);
 

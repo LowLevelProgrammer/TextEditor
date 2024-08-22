@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Transaction.h"
+#include "Command.h"
 #include <vector>
 
 class TextController {
@@ -8,14 +8,14 @@ public:
   TextController();
   ~TextController();
 
-  void Execute(Transaction *transaction);
+  void Execute(Command *transaction);
   void Undo();
   void Redo();
 
   bool CanUndo() const;
-  TransactionType GetRecentTransactionType() const;
+  CommandType GetRecentTransactionType() const;
 
 private:
-  std::vector<Transaction *> m_UndoStack;
-  std::vector<Transaction *> m_RedoStack;
+  std::vector<Command *> m_UndoStack;
+  std::vector<Command *> m_RedoStack;
 };
