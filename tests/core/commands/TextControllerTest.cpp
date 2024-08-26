@@ -188,6 +188,19 @@ TEST_F(TextControllerTest, UndoAfterEraseChar) {
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello Wor");
 }
 
+TEST_F(TextControllerTest, UndoInsertNewline) {
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+
+  textController.Execute(new InsertNewline(tb, {0, 11}));
+  EXPECT_EQ(tb.GetLineAtOffset(1), "");
+  EXPECT_EQ(tb.GetLineCount(), 2);
+
+  textController.Undo();
+  EXPECT_EQ(tb.GetLineCount(), 1);
+  EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");
+  EXPECT_DEATH(tb.GetLineAtOffset(1), "Line offset not within bounds");
+}
+
 TEST_F(TextControllerTest, UndoMixedOperations) {
   // Initial state should be "Hello World"
   EXPECT_EQ(tb.GetLineAtOffset(0), "Hello World");

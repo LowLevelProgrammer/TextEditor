@@ -8,12 +8,14 @@ public:
   TextController();
   ~TextController();
 
-  void Execute(Command *transaction);
+  void Execute(Command *command);
   void Undo();
   void Redo();
+  bool ShouldAddCheckpoint();
+  void AddCheckpoint();
 
   bool CanUndo() const;
-  CommandType GetRecentTransactionType() const;
+  CommandType GetRecentCommandType() const;
 
 private:
   std::vector<Command *> m_UndoStack;

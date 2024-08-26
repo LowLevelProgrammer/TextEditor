@@ -7,7 +7,6 @@ EraseNewline::EraseNewline(TextBuffer &textBuffer, Offset offset)
     : m_TextBuffer(textBuffer), m_Offset(offset) {
   m_CommandType = CommandType::EraseNewline;
 }
-EraseNewline::~EraseNewline() {}
 
 std::string EraseNewline::TransactionDetails() {
   std::stringstream ss;
@@ -18,15 +17,19 @@ std::string EraseNewline::TransactionDetails() {
 
 void EraseNewline::Execute() {
   m_TextBuffer.EraseNewline(m_Offset);
+  Position caretPosition = {m_Offset.Y + 1, m_Offset.X + 1};
+  m_TextBuffer.SetCaretPosition(caretPosition);
   // std::cout << TransactionDetails();
 }
 
 void EraseNewline::Undo() {
   m_TextBuffer.InsertNewline(m_Offset);
+  Position caretPositon = {m_Offset.Y + 2, 1};
+  m_TextBuffer.SetCaretPosition(caretPositon);
   // std::cout << "Undid: " << TransactionDetails();
 }
 
 void EraseNewline::Redo() {
-  m_TextBuffer.EraseNewline(m_Offset);
+  Execute();
   // std::cout << "Redid: " << TransactionDetails();
 }

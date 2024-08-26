@@ -15,25 +15,34 @@ void TextController::Undo() {
   if (m_UndoStack.empty())
     return;
 
-  Command *lastTransaction = m_UndoStack.back();
-  m_UndoStack.pop_back();
-  lastTransaction->Undo();
-  m_RedoStack.push_back(lastTransaction);
+  Command *commandPtr = m_UndoStack.back();
+
+  while (!m_UndoStack.empty() && commandPtr != nullptr) {
+    commandPtr->Undo();
+    m_UndoStack.pop_back();
+    commandPtr = m_UndoStack.back();
+  }
+  if (!m_UndoStack.empty())
+    // Remove the boundary "nullptr"
+    m_UndoStack.pop_back();
 }
 
-void TextController::Redo() {
-  if (m_RedoStack.empty())
-    return;
+void TextController::Redo() {}
 
-  Command *lastTransaction = m_RedoStack.back();
-  m_RedoStack.pop_back();
-  lastTransaction->Redo();
-  m_UndoStack.push_back(lastTransaction);
+bool TextController::ShouldAddCheckpoint() {
+  if (!m_UndoStack.empty() &&
+      (GetRecentCommandType() == CommandType::EraseChar ||
+       GetRecentCommandType() == CommandType::EraseNewline)) {
+    return true;
+  }
+  return false;
 }
+
+void TextController::AddCheckpoint() { m_UndoStack.push_back(nullptr); }
 
 bool TextController::CanUndo() const { return !m_UndoStack.empty(); }
 
-CommandType TextController::GetRecentTransactionType() const {
+CommandType TextController::GetRecentCommandType() const {
   assert(!m_UndoStack.empty());
   return m_UndoStack.back()->GetCommandType();
 }

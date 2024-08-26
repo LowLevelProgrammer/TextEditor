@@ -18,15 +18,19 @@ std::string InsertChar::TransactionDetails() {
 
 void InsertChar::Execute() {
   m_TextBuffer.InsertChar(m_Character, m_Offset);
+  Position caretPosition = {m_Offset.Y + 1, m_Offset.X + 2};
+  m_TextBuffer.SetCaretPosition(caretPosition);
   // std::cout << TransactionDetails();
 }
 
 void InsertChar::Undo() {
   m_TextBuffer.EraseChar(m_Offset);
+  Position caretPosition = {m_Offset.Y + 1, m_Offset.X + 1};
+  m_TextBuffer.SetCaretPosition(caretPosition);
   // std::cout << "Undid: " << TransactionDetails();
 }
 
 void InsertChar::Redo() {
-  m_TextBuffer.InsertChar(m_Character, m_Offset);
+  Execute();
   // std::cout << "Redid: " << TransactionDetails();
 }

@@ -16,15 +16,19 @@ std::string InsertNewline::TransactionDetails() {
 }
 void InsertNewline::Execute() {
   m_TextBuffer.InsertNewline(m_Offset);
+  Position caretPositon = {m_Offset.Y + 2, 1};
+  m_TextBuffer.SetCaretPosition(caretPositon);
   // std::cout << TransactionDetails();
 }
 
 void InsertNewline::Undo() {
   m_TextBuffer.EraseNewline(m_Offset);
+  Position caretPosition = {m_Offset.Y + 1, m_Offset.X + 1};
+  m_TextBuffer.SetCaretPosition(caretPosition);
   // std::cout << "Undid: " << TransactionDetails();
 }
 
 void InsertNewline::Redo() {
-  m_TextBuffer.InsertNewline(m_Offset);
+  Execute();
   // std::cout << "Redid: " << TransactionDetails();
 }

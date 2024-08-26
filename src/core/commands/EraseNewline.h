@@ -6,7 +6,6 @@
 class EraseNewline : public Command {
 public:
   EraseNewline(TextBuffer &textBuffer, Offset offset);
-  ~EraseNewline();
 
   std::string TransactionDetails();
   void Execute() override;

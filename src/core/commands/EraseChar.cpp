@@ -18,15 +18,19 @@ std::string EraseChar::TransactionDetails() {
 void EraseChar::Execute() {
   m_RemovedChar = m_TextBuffer.GetCharAtOffset(m_Offset);
   m_TextBuffer.EraseChar(m_Offset);
+  Position caretPosition = {m_Offset.Y + 1, m_Offset.X + 1};
+  m_TextBuffer.SetCaretPosition(caretPosition);
   // std::cout << TransactionDetails();
 }
 
 void EraseChar::Undo() {
   m_TextBuffer.InsertChar(m_RemovedChar, m_Offset);
+  Position caretPosition = {m_Offset.Y + 1, m_Offset.X + 2};
+  m_TextBuffer.SetCaretPosition(caretPosition);
   // std::cout << "Undid: " << TransactionDetails();
 }
 
 void EraseChar::Redo() {
-  m_TextBuffer.EraseChar(m_Offset);
+  Execute();
   // std::cout << "Redid: " << TransactionDetails();
 }
