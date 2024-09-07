@@ -1,12 +1,12 @@
 #include "Editor.h"
 
-#include "Command.h"
 #include "EraseChar.h"
 #include "EraseNewline.h"
 #include "InsertChar.h"
 #include "InsertNewline.h"
 #include "TextBuffer.h"
 
+#include <sstream>
 #include <string>
 #include <sys/types.h>
 
@@ -77,6 +77,7 @@ void Editor::Undo() {
 }
 
 void Editor::Redo() {}
+
 void Editor::SetCaretPosition(Position position) {
   m_TextBuffer.SetCaretPosition(position);
 }
@@ -115,3 +116,20 @@ void Editor::MoveCaret(Direction direction) {
 bool Editor::IsFileOpen() { return m_FileHandler.IsOpen(); }
 
 std::string Editor::GetFilePath() { return m_FileHandler.GetFilePath(); }
+
+const std::vector<Command *> &Editor::GetUndoStack() const {
+  return m_TextController.GetUndoStack();
+}
+
+std::string Editor::GetText() const {
+  auto tb = m_TextBuffer.GetLines();
+  std::stringstream text;
+
+  for (int i = 0; i < tb.size(); i++) {
+    text << tb[i];
+    if (i < tb.size() - 1) {
+      text << std::endl;
+    }
+  }
+  return text.str();
+}

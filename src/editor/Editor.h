@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Command.h"
 #include "FileHandler.h"
 #include "Register.h"
 #include "TextBuffer.h"
@@ -28,6 +29,8 @@ public:
   void MoveCaret(Direction direction);
   bool IsFileOpen();
   std::string GetFilePath();
+  const std::vector<Command *> &GetUndoStack() const;
+  std::string GetText() const;
 
   inline const Position &GetCaretPosition() const {
     return m_TextBuffer.GetCaretPosition();

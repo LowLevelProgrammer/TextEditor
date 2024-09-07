@@ -7,10 +7,14 @@ class EraseChar : public Command {
 public:
   EraseChar(TextBuffer &textBuffer, Offset offset);
 
-  std::string TransactionDetails();
+  std::string TransactionDetails() override;
   void Execute() override;
   void Undo() override;
   void Redo() override;
+
+  inline const char GetCommandCharacter() const override {
+    return m_RemovedChar;
+  }
 
 protected:
   TextBuffer &m_TextBuffer;

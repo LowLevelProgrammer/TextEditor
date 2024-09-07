@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include "BoxedWindow.h"
+#include "utilities.h"
 
 Application::Application() : m_MainWindow(m_Editor), m_IsRunning(true) {
   m_MainWindow.Init();
@@ -20,7 +21,10 @@ void Application::Clear() {
   m_SecondaryWindow->Clear();
 }
 
-void Application::Draw() { m_MainWindow.Draw(); }
+void Application::Draw() {
+  m_SecondaryWindow->Draw(GetUndoStackString(m_Editor.GetUndoStack()));
+  m_MainWindow.Draw();
+}
 
 void Application::Refresh() {
   m_SecondaryWindow->Refresh();

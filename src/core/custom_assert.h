@@ -13,3 +13,6 @@
 #define ASSERT_WITHIN_LINE_BOUNDS(lineOffset, lines)                           \
   assert(lineOffset >= 0 && lineOffset < m_Lines.size() &&                     \
          "Line offset not within bounds");
+
+#define ASSERT_NOT_EMPTY(vector)                                               \
+  assert(!vector.empty() && "Vector should not be empty")

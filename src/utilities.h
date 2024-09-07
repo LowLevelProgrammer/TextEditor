@@ -1,7 +1,9 @@
 #pragma once
 
+#include "Command.h"
 #include "TextBuffer.h"
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -33,7 +35,7 @@ inline std::string GetPrintableString(char character) {
     return std::string(1, character);
 }
 
-inline std::string GetOperationTypeString(OperationType type) {
+inline std::string GetCommandTypeString(OperationType type) {
   switch (type) {
   case OperationType::InsertChar:
     return "Add";
@@ -72,7 +74,7 @@ inline std::string GetOperationTypeString(OperationType type) {
 //   }
 //   std::cout << std::endl;
 // }
-//
+
 // inline std::string
 // GetUndoStackString(const std::vector<Transaction> &undoStack) {
 //   std::stringstream ss;
@@ -82,13 +84,19 @@ inline std::string GetOperationTypeString(OperationType type) {
 //   }
 //   return ss.str();
 // }
-//
-// inline void PrintUndoStack(const std::vector<Transaction> &undoStack) {
-//   std::cout << "Undo Stack:-" << std::endl;
-//   for (Transaction trnxn : undoStack) {
-//     PrintTransaction(trnxn);
-//   }
-// }
+
+inline std::string GetUndoStackString(const std::vector<Command *> &undoStack) {
+  std::stringstream ss;
+  ss << "Undo Stack:-" << std::endl;
+  for (Command *cmd : undoStack) {
+    if (cmd == nullptr) {
+      ss << "Break point" << std::endl;
+      continue;
+    }
+    ss << cmd->TransactionDetails();
+  }
+  return ss.str();
+}
 
 inline void PrintCaretPosition(const Position &position) {
   std::cout << "Caret Position: { " << position.Line << ", " << position.Column

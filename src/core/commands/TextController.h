@@ -16,6 +16,13 @@ public:
 
   bool CanUndo() const;
   CommandType GetRecentCommandType() const;
+  std::size_t GetUndoStackSize() const;
+
+  bool IsUndoStackEmpty() const;
+
+  inline const std::vector<Command *> &GetUndoStack() const {
+    return m_UndoStack;
+  }
 
 private:
   std::vector<Command *> m_UndoStack;
