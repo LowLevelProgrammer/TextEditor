@@ -1,10 +1,12 @@
 #include "Application.h"
 
 #include "BoxedWindow.h"
+#include "MainWindow.h"
 #include "utilities.h"
 
-Application::Application() : m_MainWindow(m_Editor), m_IsRunning(true) {
-  m_MainWindow.Init();
+Application::Application() : m_IsRunning(true) {
+  m_TUI.Init();
+  m_MainWindow = new MainWindow(m_Editor);
 
   int rows, cols;
   getmaxyx(stdscr, rows, cols);
@@ -12,24 +14,24 @@ Application::Application() : m_MainWindow(m_Editor), m_IsRunning(true) {
   m_SecondaryWindow = new BoxedWindow(rows, cols / 2, 0, cols / 2);
 }
 
-Application::~Application() {}
+Application::~Application() { m_TUI.CleanUp(); }
 
-void Application::ProcessInput() { m_MainWindow.ProcessInput(); }
+void Application::ProcessInput() { m_MainWindow->ProcessInput(); }
 
 void Application::Clear() {
-  m_MainWindow.Clear();
-  m_SecondaryWindow->Clear();
+  m_MainWindow->Clear();
+  // m_SecondaryWindow->Clear();
 }
 
 void Application::Draw() {
-  m_SecondaryWindow->Draw(GetUndoStackString(m_Editor.GetUndoStack()));
-  m_MainWindow.Draw();
+  // m_SecondaryWindow->Draw(GetUndoStackString(m_Editor.GetUndoStack()));
+  m_MainWindow->Draw();
 }
 
 void Application::Refresh() {
-  m_SecondaryWindow->Refresh();
-  m_MainWindow.Refresh();
-  m_MainWindow.RefreshCursor();
+  // m_SecondaryWindow->Refresh();
+  m_MainWindow->Refresh();
+  // m_MainWindow->RefreshCursor();
 }
 
 void Application::Run() {
@@ -40,10 +42,8 @@ void Application::Run() {
     Draw();
     Refresh();
 
-    if (m_MainWindow.ShouldQuit()) {
+    if (m_MainWindow->ShouldQuit()) {
       m_IsRunning = false;
     }
   }
-
-  m_MainWindow.CleanUp();
 }

@@ -8,6 +8,7 @@ public:
   virtual ~Window();
 
   void Clear();
+  // Draw line of text
   void DrawLine(const std::string &content, int y);
   virtual void Draw(const std::string &content);
   virtual void Refresh();

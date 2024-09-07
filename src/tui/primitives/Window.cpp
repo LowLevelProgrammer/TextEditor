@@ -7,7 +7,7 @@ Window::Window(int h, int w, int y, int x)
   keypad(m_Win, TRUE);
 }
 
-Window::~Window() {}
+Window::~Window() { delwin(m_Win); }
 
 void Window::Clear() { wclear(m_Win); }
 

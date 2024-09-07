@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Editor.h"
+#include "MainWindow.h"
 #include "TUI.h"
 #include "Window.h"
 
@@ -16,8 +17,9 @@ public:
   void Run();
 
 private:
+  TUI m_TUI;
   Editor m_Editor;
-  TUI m_MainWindow;
+  MainWindow *m_MainWindow;
   Window *m_SecondaryWindow;
   bool m_IsRunning;
 };
