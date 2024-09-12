@@ -1,25 +1,29 @@
 #pragma once
 
 #include "Editor.h"
-#include "MainWindow.h"
-#include "TUI.h"
-#include "Window.h"
+#include "Event.h"
+#include "InputManager.h"
+#include "RenderManager.h"
 
-class Application {
+class Application : public EventListener {
 public:
   Application();
   ~Application();
 
-  void ProcessInput();
-  void Clear();
-  void Draw();
-  void Refresh();
+  void Initialize();
   void Run();
+  void Shutdown();
+
+  void OnEvent(Event &event) override;
 
 private:
-  TUI m_TUI;
+  void Render();
+
+private:
   Editor m_Editor;
-  MainWindow *m_MainWindow;
-  Window *m_SecondaryWindow;
+  RenderManager m_RenderManager;
+  EventDispatcher m_EventDispatcher;
+  InputManager m_InputManager;
+
   bool m_IsRunning;
 };

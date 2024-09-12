@@ -1,49 +1,44 @@
 #include "Application.h"
 
-#include "BoxedWindow.h"
-#include "MainWindow.h"
-#include "utilities.h"
+#include "Event.h"
+#include "KeyboardEvent.h"
+#include <ncurses.h>
 
-Application::Application() : m_IsRunning(true) {
-  m_TUI.Init();
-  m_MainWindow = new MainWindow(m_Editor);
+#define KEY_ESCAPE 27
 
-  int rows, cols;
-  getmaxyx(stdscr, rows, cols);
+Application::Application()
+    : m_IsRunning(true), m_InputManager(&m_EventDispatcher) {}
 
-  m_SecondaryWindow = new BoxedWindow(rows, cols / 2, 0, cols / 2);
-}
+Application::~Application() {}
 
-Application::~Application() { m_TUI.CleanUp(); }
+void Application::Initialize() {
+  m_RenderManager.Initialize();
 
-void Application::ProcessInput() { m_MainWindow->ProcessInput(); }
-
-void Application::Clear() {
-  m_MainWindow->Clear();
-  // m_SecondaryWindow->Clear();
-}
-
-void Application::Draw() {
-  // m_SecondaryWindow->Draw(GetUndoStackString(m_Editor.GetUndoStack()));
-  m_MainWindow->Draw();
-}
-
-void Application::Refresh() {
-  // m_SecondaryWindow->Refresh();
-  m_MainWindow->Refresh();
-  // m_MainWindow->RefreshCursor();
+  m_EventDispatcher.RegisterListener(this);
+  m_EventDispatcher.RegisterListener(&m_Editor);
 }
 
 void Application::Run() {
-
   while (m_IsRunning) {
-    ProcessInput();
-    Clear();
-    Draw();
-    Refresh();
+    m_InputManager.GetInput();
 
-    if (m_MainWindow->ShouldQuit()) {
+    Render();
+  }
+}
+
+void Application::Shutdown() {}
+
+void Application::OnEvent(Event &event) {
+  if (event.GetType() == EventType::KeyPressed) {
+    KeyEvent &keyEvent = static_cast<KeyEvent &>(event);
+    int key = keyEvent.GetKey();
+
+    if (key == KEY_ESCAPE) {
       m_IsRunning = false;
     }
   }
+}
+
+void Application::Render() {
+  m_RenderManager.Render(m_Editor.GetTextBuffer(), m_Editor.GetCaretPosition());
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Command.h"
+#include "Event.h"
 #include "FileHandler.h"
 #include "Register.h"
 #include "TextBuffer.h"
@@ -8,7 +9,7 @@
 #include <string>
 #include <vector>
 
-class Editor {
+class Editor : public EventListener {
 public:
   Editor();
   ~Editor();
@@ -25,12 +26,13 @@ public:
   void OpenFile(std::string filePath);
   void Save();
   void SaveAs(std::string filePath);
-  void Display();
   void MoveCaret(Direction direction);
   bool IsFileOpen();
   std::string GetFilePath();
   const std::vector<Command *> &GetUndoStack() const;
   std::string GetText() const;
+
+  void OnEvent(Event &event) override;
 
   inline const Position &GetCaretPosition() const {
     return m_TextBuffer.GetCaretPosition();
@@ -39,9 +41,6 @@ public:
   inline const std::vector<std::string> &GetTextBuffer() const {
     return m_TextBuffer.GetLines();
   }
-
-private:
-  void HandleInput();
 
 private:
   TextBuffer m_TextBuffer;

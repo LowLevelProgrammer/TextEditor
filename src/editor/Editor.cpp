@@ -2,13 +2,18 @@
 
 #include "EraseChar.h"
 #include "EraseNewline.h"
+#include "Event.h"
 #include "InsertChar.h"
 #include "InsertNewline.h"
+#include "KeyboardEvent.h"
 #include "TextBuffer.h"
 
+#include <ncurses.h>
 #include <sstream>
 #include <string>
 #include <sys/types.h>
+
+#define ctrl(x) (x & 0x1F)
 
 Editor::Editor() : m_TextBuffer(), m_FileHandler() {
   m_Register = new Register[10];
@@ -106,8 +111,8 @@ void Editor::Save() {
 void Editor::SaveAs(std::string filePath) {
   m_FileHandler.SaveAs(m_TextBuffer, filePath);
 }
+
 /* Private Functions */
-void Editor::Display() { m_TextBuffer.PrintBuffer(); }
 
 void Editor::MoveCaret(Direction direction) {
   m_TextBuffer.MoveCaret(direction);
@@ -132,4 +137,38 @@ std::string Editor::GetText() const {
     }
   }
   return text.str();
+}
+
+void Editor::OnEvent(Event &event) {
+  if (event.GetType() == EventType::KeyPressed) {
+    KeyEvent &keyEvent = static_cast<KeyEvent &>(event);
+    int key = keyEvent.GetKey();
+
+    switch (key) {
+    case ctrl('u'):
+      Undo();
+      break;
+    case ctrl('r'):
+      Redo();
+      break;
+    case KEY_LEFT:
+      MoveCaret(Direction::Left);
+      break;
+    case KEY_RIGHT:
+      MoveCaret(Direction::Right);
+      break;
+    case KEY_UP:
+      MoveCaret(Direction::Up);
+      break;
+    case KEY_DOWN:
+      MoveCaret(Direction::Down);
+      break;
+    case KEY_BACKSPACE:
+      BackSpace();
+      break;
+    default:
+      InsertChar(key);
+      break;
+    }
+  }
 }
