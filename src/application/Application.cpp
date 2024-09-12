@@ -1,8 +1,7 @@
 #include "Application.h"
 
-#include "Event.h"
+#include "EditorPane.h"
 #include "KeyboardEvent.h"
-#include <ncurses.h>
 
 #define KEY_ESCAPE 27
 
@@ -16,13 +15,16 @@ void Application::Initialize() {
 
   m_EventDispatcher.RegisterListener(this);
   m_EventDispatcher.RegisterListener(&m_Editor);
+
+  Pane *editorPane = new EditorPane(m_Editor, LINES, COLS, 0, 0);
+  m_PaneManager.AddPane(editorPane);
 }
 
 void Application::Run() {
   while (m_IsRunning) {
-    m_InputManager.GetInput();
+    m_RenderManager.Render(m_PaneManager.GetPanes());
 
-    Render();
+    PollEvents();
   }
 }
 
@@ -39,6 +41,8 @@ void Application::OnEvent(Event &event) {
   }
 }
 
-void Application::Render() {
-  m_RenderManager.Render(m_Editor.GetTextBuffer(), m_Editor.GetCaretPosition());
+void Application::PollEvents() {
+  for (auto pane : m_PaneManager.GetPanes()) {
+    m_InputManager.GetInput(pane->GetWindow());
+  }
 }

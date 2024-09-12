@@ -11,7 +11,7 @@ RenderManager::~RenderManager() { Shutdown(); }
 void RenderManager::Initialize() {
   initscr();
   start_color();
-  // cbreak();
+  cbreak();
   raw();
   keypad(stdscr, TRUE);
   noecho();
@@ -19,26 +19,13 @@ void RenderManager::Initialize() {
   DisableFlowControl();
 }
 
-void RenderManager::Render(const std::vector<std::string> &textBuffer,
-                           const Position &caretPosition) {
-  clear();
-  RenderTextBuffer(textBuffer);
-  RenderCaret(caretPosition);
-  refresh();
-}
-
-void RenderManager::Shutdown() { endwin(); }
-
-void RenderManager::RenderTextBuffer(
-    const std::vector<std::string> &textBuffer) {
-  for (std::size_t i = 0; i < textBuffer.size(); i++) {
-    mvprintw(i, 0, "%s", textBuffer[i].c_str());
+void RenderManager::Render(const std::vector<Pane *> &panes) {
+  for (auto &pane : panes) {
+    pane->Render();
   }
 }
 
-void RenderManager::RenderCaret(const Position &caretPosition) {
-  move(caretPosition.Line - 1, caretPosition.Column - 1);
-}
+void RenderManager::Shutdown() { endwin(); }
 
 void RenderManager::DisableFlowControl() {
   struct termios tty;

@@ -9,8 +9,8 @@ InputManager::InputManager(EventDispatcher *dispacter)
 
 InputManager::~InputManager() {}
 
-void InputManager::GetInput() {
-  int key = getch();
+void InputManager::GetInput(WINDOW *win) {
+  int key = wgetch(win);
 
   if (key != ERR) {
     KeyEvent keyEvent(key);

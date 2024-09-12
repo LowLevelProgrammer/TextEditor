@@ -164,6 +164,8 @@ void Editor::OnEvent(Event &event) {
       MoveCaret(Direction::Down);
       break;
     case KEY_BACKSPACE:
+    case 27:
+    case 127:
       BackSpace();
       break;
     default:
