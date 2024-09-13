@@ -18,11 +18,13 @@ void Application::Initialize() {
 
   Pane *editorPane = new EditorPane(m_Editor, LINES, COLS, 0, 0);
   m_PaneManager.AddPane(editorPane);
+  m_PaneManager.SetActivePane(editorPane);
 }
 
 void Application::Run() {
   while (m_IsRunning) {
-    m_RenderManager.Render(m_PaneManager.GetPanes());
+    m_RenderManager.Render(m_PaneManager.GetPanes(),
+                           m_PaneManager.GetActivePane());
 
     PollEvents();
   }

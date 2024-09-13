@@ -10,7 +10,7 @@ EditorPane::EditorPane(Editor &editor, int height, int width, int y, int x)
 
 EditorPane::~EditorPane() {}
 
-void EditorPane::Render() {
+void EditorPane::Render(bool isActive) {
   werase(m_Window);
 
   box(m_Window, 0, 0);
@@ -19,8 +19,11 @@ void EditorPane::Render() {
   for (size_t i = 0; i < lines.size(); i++) {
     mvwprintw(m_Window, i + 1, 1, "%s", lines[i].c_str());
   }
-  const Position &caretPostion = m_Editor.GetCaretPosition();
-  wmove(m_Window, caretPostion.Line, caretPostion.Column);
+
+  if (isActive) {
+    const Position &caretPostion = m_Editor.GetCaretPosition();
+    wmove(m_Window, caretPostion.Line, caretPostion.Column);
+  }
 
   wrefresh(m_Window);
 }

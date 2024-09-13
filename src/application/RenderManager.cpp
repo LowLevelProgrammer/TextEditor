@@ -19,9 +19,12 @@ void RenderManager::Initialize() {
   DisableFlowControl();
 }
 
-void RenderManager::Render(const std::vector<Pane *> &panes) {
+void RenderManager::Render(const std::vector<Pane *> &panes,
+                           const Pane *activePane) {
   for (auto &pane : panes) {
-    pane->Render();
+    bool isActive = (pane == activePane);
+
+    pane->Render(isActive);
   }
 }
 

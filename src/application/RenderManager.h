@@ -9,7 +9,7 @@ public:
   ~RenderManager();
 
   void Initialize();
-  void Render(const std::vector<Pane *> &panes);
+  void Render(const std::vector<Pane *> &panes, const Pane *activePane);
   void Shutdown();
 
 private:
