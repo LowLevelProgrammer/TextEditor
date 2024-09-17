@@ -7,7 +7,7 @@ public:
   Pane(int height, int width, int y, int x);
   ~Pane();
 
-  virtual void Render(bool isActive) = 0;
+  virtual void Render() = 0;
 
   WINDOW *GetWindow() const { return m_Window; }
 

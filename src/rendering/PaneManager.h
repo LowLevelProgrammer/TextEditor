@@ -12,7 +12,7 @@ public:
 
   void SetActivePane(Pane *pane) { m_ActivePane = pane; }
 
-  const Pane *GetActivePane() const { return m_ActivePane; }
+  Pane *GetActivePane() const { return m_ActivePane; }
   const std::vector<Pane *> &GetPanes() const { return m_Panes; }
 
 private:

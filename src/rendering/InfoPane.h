@@ -3,10 +3,10 @@
 #include "Editor.h"
 #include "Pane.h"
 
-class EditorPane : public Pane {
+class InfoPane : public Pane {
 public:
-  EditorPane(Editor &editor, int height, int width, int y, int x);
-  ~EditorPane();
+  InfoPane(Editor &editor, int height, int width, int y, int x);
+  ~InfoPane();
 
   void Render() override;
 
