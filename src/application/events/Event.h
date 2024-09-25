@@ -8,6 +8,8 @@ public:
   virtual ~Event() = default;
 
   virtual EventType GetType() const = 0;
+
+  bool handled = false;
 };
 
 class EventListener {
@@ -24,8 +26,15 @@ public:
   }
 
   void Dispatch(Event &event) {
-    for (auto *listener : m_Listener) {
-      listener->OnEvent(event);
+    // for (auto *listener : m_Listener) {
+    //   listener->OnEvent(event);
+    // }
+
+    // Iterate from last listener (top most layer) to the first
+    for (auto it = m_Listener.rbegin(); it != m_Listener.rend(); it++) {
+      (*it)->OnEvent(event);
+      if (event.handled)
+        break;
     }
   }
 

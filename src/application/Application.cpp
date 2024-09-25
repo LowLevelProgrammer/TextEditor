@@ -1,53 +1,62 @@
 #include "Application.h"
 
-#include "EditorPane.h"
-#include "InfoPane.h"
+#include "EditorNcursesPane.h"
+#include "InfoNcursesPane.h"
 #include "KeyboardEvent.h"
+#include "NcursesRenderer.h"
+#include "NcursesWindow.h"
 
 #define KEY_ESCAPE 27
+#define ctrl(x) (x & 0x1F)
 
-Application::Application()
-    : m_IsRunning(true), m_InputManager(&m_EventDispatcher) {}
+Application::Application() : m_IsRunning(true) {}
 
 Application::~Application() {}
 
 void Application::Initialize() {
-  m_RenderManager.Initialize();
+  m_Renderer = new NcursesRenderer();
+  m_Window = new NcursesWindow();
 
+  m_EditorPane = new EditorNcursesPane(m_Editor, m_Window->GetHeight() - 3,
+                                       m_Window->GetWidth(), 0, 0);
   m_EventDispatcher.RegisterListener(this);
-  m_EventDispatcher.RegisterListener(&m_Editor);
+  m_EventDispatcher.RegisterListener(m_EditorPane);
 
-  Pane *editorPane = new EditorPane(m_Editor, LINES - 3, COLS, 0, 0);
-  m_PaneManager.AddPane(editorPane);
-  m_PaneManager.SetActivePane(editorPane);
+  m_Window->AddPane(m_EditorPane);
+  m_Window->SetFocus(m_EditorPane);
 
-  Pane *infoPane = new InfoPane(m_Editor, 3, COLS, LINES - 3, 0);
-  m_PaneManager.AddPane(infoPane);
+  IPane *infoPane = new InfoNcursesPane(m_Editor, 3, m_Window->GetWidth(),
+                                        m_Window->GetHeight() - 3, 0);
+  m_Window->AddPane(infoPane);
 }
 
 void Application::Run() {
   while (m_IsRunning) {
-    m_RenderManager.Render(m_PaneManager.GetPanes(),
-                           m_PaneManager.GetActivePane(),
-                           m_Editor.GetCaretPosition());
+    m_Window->Render(m_Renderer);
 
     PollEvents();
   }
 }
 
-void Application::Shutdown() {}
+void Application::Shutdown() { m_Window->Shutdown(); }
 
 void Application::OnEvent(Event &event) {
   if (event.GetType() == EventType::KeyPressed) {
     KeyEvent &keyEvent = static_cast<KeyEvent &>(event);
     int key = keyEvent.GetKey();
 
-    if (key == KEY_ESCAPE) {
+    switch (key) {
+    case KEY_ESCAPE:
       m_IsRunning = false;
+      break;
+    case ctrl('o'):
+      break;
     }
   }
 }
 
 void Application::PollEvents() {
-  m_InputManager.GetInput(m_PaneManager.GetActivePane()->GetWindow());
+  int key = m_Window->ReceiveInput();
+  KeyEvent event(key);
+  m_EventDispatcher.Dispatch(event);
 }

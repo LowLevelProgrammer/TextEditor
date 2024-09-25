@@ -2,9 +2,7 @@
 
 #include "Editor.h"
 #include "Event.h"
-#include "InputManager.h"
-#include "PaneManager.h"
-#include "RenderManager.h"
+#include "IWindow.h"
 
 class Application : public EventListener {
 public:
@@ -15,17 +13,16 @@ public:
   void Run();
   void Shutdown();
 
+private:
+  void PollEvents();
   void OnEvent(Event &event) override;
 
 private:
-  void PollEvents();
-
-private:
   Editor m_Editor;
-  RenderManager m_RenderManager;
+  IRenderer *m_Renderer;
+  IWindow *m_Window;
   EventDispatcher m_EventDispatcher;
-  InputManager m_InputManager;
-  PaneManager m_PaneManager;
+  IPane *m_EditorPane;
 
   bool m_IsRunning;
 };

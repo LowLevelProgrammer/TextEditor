@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-class Editor : public EventListener {
+class Editor {
 public:
   Editor();
   ~Editor();
@@ -31,8 +31,6 @@ public:
   std::string GetFilePath();
   const std::vector<Command *> &GetUndoStack() const;
   std::string GetText() const;
-
-  void OnEvent(Event &event) override;
 
   inline const Position &GetCaretPosition() const {
     return m_TextBuffer.GetCaretPosition();

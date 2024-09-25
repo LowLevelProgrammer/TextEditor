@@ -139,38 +139,38 @@ std::string Editor::GetText() const {
   return text.str();
 }
 
-void Editor::OnEvent(Event &event) {
-  if (event.GetType() == EventType::KeyPressed) {
-    KeyEvent &keyEvent = static_cast<KeyEvent &>(event);
-    int key = keyEvent.GetKey();
-
-    switch (key) {
-    case ctrl('u'):
-      Undo();
-      break;
-    case ctrl('r'):
-      Redo();
-      break;
-    case KEY_LEFT:
-      MoveCaret(Direction::Left);
-      break;
-    case KEY_RIGHT:
-      MoveCaret(Direction::Right);
-      break;
-    case KEY_UP:
-      MoveCaret(Direction::Up);
-      break;
-    case KEY_DOWN:
-      MoveCaret(Direction::Down);
-      break;
-    case KEY_BACKSPACE:
-    case 27:
-    case 127:
-      BackSpace();
-      break;
-    default:
-      InsertChar(key);
-      break;
-    }
-  }
-}
+// void Editor::OnEvent(Event &event) {
+//   if (event.GetType() == EventType::KeyPressed) {
+//     KeyEvent &keyEvent = static_cast<KeyEvent &>(event);
+//     int key = keyEvent.GetKey();
+//
+//     switch (key) {
+//     case ctrl('u'):
+//       Undo();
+//       break;
+//     case ctrl('r'):
+//       Redo();
+//       break;
+//     case KEY_LEFT:
+//       MoveCaret(Direction::Left);
+//       break;
+//     case KEY_RIGHT:
+//       MoveCaret(Direction::Right);
+//       break;
+//     case KEY_UP:
+//       MoveCaret(Direction::Up);
+//       break;
+//     case KEY_DOWN:
+//       MoveCaret(Direction::Down);
+//       break;
+//     case KEY_BACKSPACE:
+//     case 27:
+//     case 127:
+//       BackSpace();
+//       break;
+//     default:
+//       InsertChar(key);
+//       break;
+//     }
+//   }
+// }
