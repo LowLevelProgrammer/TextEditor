@@ -1,11 +1,12 @@
 #include "NcursesWindow.h"
+
+#ifdef __linux__
+
 #include "Globals.h"
-#include "KeyboardEvent.h"
 #include "NcursesRenderer.h"
 
 #include <algorithm>
 #include <cassert>
-#include <functional>
 #include <ncurses.h>
 
 NcursesWindow::NcursesWindow() : m_Width(COLS), m_Height(LINES) {
@@ -48,3 +49,5 @@ int NcursesWindow::ReceiveInput() {
 void NcursesWindow::SetFocus(IPane *pane) { m_FocusedPane = pane; }
 
 void NcursesWindow::Shutdown() { endwin(); }
+
+#endif

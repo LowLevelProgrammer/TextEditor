@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef __linux__
+
 #include "Editor.h"
 #include "NcursesPane.h"
 #include "TextBuffer.h"
@@ -17,3 +19,5 @@ private:
   Editor &m_Editor;
   Position m_CaretPosition;
 };
+
+#endif

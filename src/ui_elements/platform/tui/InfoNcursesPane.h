@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef __linux__
+
 #include "Editor.h"
 #include "NcursesPane.h"
 
@@ -15,3 +17,5 @@ public:
 private:
   Editor &m_Editor;
 };
+
+#endif

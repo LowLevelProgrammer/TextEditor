@@ -1,4 +1,6 @@
-#include "DialogBox.h"
+#include "DialogBoxNcursesPane.h"
+
+#ifdef __linux__
 
 #include "Event.h"
 #include "KeyboardEvent.h"
@@ -8,17 +10,17 @@
 static int height = 10;
 static int width = 38;
 
-DialogBox::DialogBox()
+DialogBoxNcursesPane::DialogBoxNcursesPane()
     : NcursesPane(height, width, LINES / 2 - height / 2, COLS / 2 - width / 2) {
   m_CaretPosition = {4, 3};
 }
 
-DialogBox::DialogBox(int height, int width, int y, int x)
+DialogBoxNcursesPane::DialogBoxNcursesPane(int height, int width, int y, int x)
     : NcursesPane(height, width, y, x) {}
 
-DialogBox::~DialogBox() {}
+DialogBoxNcursesPane::~DialogBoxNcursesPane() {}
 
-void DialogBox::Render(IRenderer *renderer) {
+void DialogBoxNcursesPane::Render(IRenderer *renderer) {
   // werase(m_Window);
   //
   // box(m_Window, 0, 0);
@@ -29,9 +31,11 @@ void DialogBox::Render(IRenderer *renderer) {
   // wrefresh(m_Window);
 }
 
-Position DialogBox::GetCaretPosition() const { return m_CaretPosition; }
+Position DialogBoxNcursesPane::GetCaretPosition() const {
+  return m_CaretPosition;
+}
 
-void DialogBox::OnEvent(Event &event) {
+void DialogBoxNcursesPane::OnEvent(Event &event) {
   if (event.GetType() == EventType::KeyPressed) {
     KeyEvent &keyEvent = static_cast<KeyEvent &>(event);
     int key = keyEvent.GetKey();
@@ -50,3 +54,5 @@ void DialogBox::OnEvent(Event &event) {
     }
   }
 }
+
+#endif

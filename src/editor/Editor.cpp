@@ -2,16 +2,12 @@
 
 #include "EraseChar.h"
 #include "EraseNewline.h"
-#include "Event.h"
 #include "InsertChar.h"
 #include "InsertNewline.h"
-#include "KeyboardEvent.h"
 #include "TextBuffer.h"
 
-#include <ncurses.h>
 #include <sstream>
 #include <string>
-#include <sys/types.h>
 
 #define ctrl(x) (x & 0x1F)
 

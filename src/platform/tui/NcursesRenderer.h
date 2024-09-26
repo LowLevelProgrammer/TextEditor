@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef __linux__
+
 #include "IRenderer.h"
 #include <ncurses.h>
 
@@ -30,3 +32,5 @@ public:
 private:
   void DisableFlowControl();
 };
+
+#endif

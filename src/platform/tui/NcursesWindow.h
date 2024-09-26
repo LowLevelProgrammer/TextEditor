@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Event.h"
+#ifdef __linux__
+
 #include "IPane.h"
 #include "IWindow.h"
 #include <ncurses.h>
@@ -26,3 +27,5 @@ private:
   IPane *m_FocusedPane;
   int m_Height, m_Width;
 };
+
+#endif

@@ -1,5 +1,7 @@
 #include "InfoNcursesPane.h"
 
+#ifdef __linux__
+
 #include <ncurses.h>
 #include <sstream>
 
@@ -26,3 +28,5 @@ void InfoNcursesPane::Render(IRenderer *renderer) {
 void InfoNcursesPane::OnEvent(Event &event) {}
 
 Position InfoNcursesPane::GetCaretPosition() const { return {-1, -1}; }
+
+#endif

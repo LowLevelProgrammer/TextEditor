@@ -8,8 +8,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Libraries
-find_package(Curses REQUIRED)
-include_directories(${CURSES_INCLUDE_DIR})
 
 # Include directories
 include_directories(src/ui_elements/platform/tui src/platform/tui src/platform src/ui_elements src/application/events src/core/commands src/core src/io src/editor src/application src/)
@@ -18,8 +16,18 @@ include_directories(src/ui_elements/platform/tui src/platform/tui src/platform s
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
 
 add_executable(TextEditor ${SOURCE_FILES})
-target_link_libraries(TextEditor ${CURSES_LIBRARIES} tinfo)
 
-# Add test directory
-enable_testing()
-add_subdirectory(tests)
+# Platform specific settings
+if (UNIX AND NOT APPLE)
+  # Find and include ncurses
+  find_package(Curses REQUIRED)
+  include_directories(${CURSES_INCLUDE_DIR})
+  # Link ncurses
+  target_link_libraries(TextEditor ${CURSES_LIBRARIES} tinfo)
+
+  # Add test directory
+  enable_testing()
+  add_subdirectory(tests)
+endif()
+
+

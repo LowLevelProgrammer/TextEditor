@@ -1,5 +1,7 @@
 #include "EditorNcursesPane.h"
 
+#ifdef __linux__
+
 #include "Editor.h"
 #include "KeyboardEvent.h"
 #include <ncurses.h>
@@ -16,16 +18,6 @@ EditorNcursesPane::EditorNcursesPane(Editor &editor, int height, int width,
 EditorNcursesPane::~EditorNcursesPane() {}
 
 void EditorNcursesPane::Render(IRenderer *renderer) {
-  // werase(m_Window);
-  //
-  // box(m_Window, 0, 0);
-  //
-  // const std::vector<std::string> &lines = m_Editor.GetTextBuffer();
-  // for (size_t i = 0; i < lines.size(); i++) {
-  //   mvwprintw(m_Window, i + 1, 1, "%s", lines[i].c_str());
-  // }
-  // wnoutrefresh(m_Window);
-
   renderer->Clear(m_Context);
 
   renderer->DrawBox(m_Context, 0, 0, m_Width, m_Height);
@@ -83,3 +75,5 @@ void EditorNcursesPane::OnEvent(Event &event) {
     event.handled = true;
   }
 }
+
+#endif

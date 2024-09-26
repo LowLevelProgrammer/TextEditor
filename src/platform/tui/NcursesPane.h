@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef __linux__
+
 #include "IPane.h"
 #include <ncurses.h>
 
@@ -12,3 +14,5 @@ public:
   virtual void OnEvent(Event &event) = 0;
   virtual Position GetCaretPosition() const = 0;
 };
+
+#endif

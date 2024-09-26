@@ -1,5 +1,7 @@
 #include "NcursesRenderer.h"
 
+#ifdef __linux__
+
 #include <cassert>
 #include <ncurses.h>
 #include <termios.h>
@@ -64,3 +66,5 @@ void NcursesRenderer::DisableFlowControl() {
 
   tcsetattr(STDIN_FILENO, TCSANOW, &tty);
 }
+
+#endif

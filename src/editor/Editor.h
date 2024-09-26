@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Command.h"
-#include "Event.h"
 #include "FileHandler.h"
 #include "Register.h"
 #include "TextBuffer.h"

@@ -1,4 +1,7 @@
 #include "NcursesPane.h"
+
+#ifdef __linux__
+
 #include "NcursesRenderer.h"
 
 #include <ncurses.h>
@@ -9,3 +12,5 @@ NcursesPane::NcursesPane(int height, int width, int y, int x)
 }
 
 NcursesPane::~NcursesPane() {}
+
+#endif
